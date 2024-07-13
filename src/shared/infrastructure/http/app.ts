@@ -1,0 +1,23 @@
+import "dotenv/config";
+
+import { ApolloServer } from "@apollo/server";
+import fastifyApollo, { fastifyApolloDrainPlugin } from "@as-integrations/fastify";
+import Fastify from "fastify";
+import schema from "./graphql/schema";
+
+(async () => {
+	const fastify = Fastify();
+
+	const apollo = new ApolloServer({
+		schema: schema,
+		plugins: [fastifyApolloDrainPlugin(fastify)],
+	});
+
+	await apollo.start();
+
+	await fastify.register(fastifyApollo(apollo));
+
+	fastify.listen({ port: Number(process.env.PORT) || 8080 }, (error) => {
+		if (error) throw error;
+	});
+})();
