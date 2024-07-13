@@ -27,9 +27,7 @@ export class StoreStorage implements UseCase<StoreStorageDTO, StoreStorageRespon
 				return left(Result.fail(fruitCombineResult.getErrorValue()));
 			}
 
-			const storage = await this._storageRepository.getStorage(
-				storageFruitIdOrError.getValue(),
-			);
+			const storage = await this._storageRepository.getStorage(storageFruitIdOrError.getValue());
 			if (!storage) {
 				return left(
 					Result.fail(
