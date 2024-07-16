@@ -1,34 +1,23 @@
-# TO DO
+# Fruit Storage
 
-- [x] Fruit Module
-- [x] Storage Module
-- [x] Cron Scheduler and Transactional Outbox
-  - [x] Fruit
-    - [x] Create
-    - [x] Update
-    - [x] Delete
-  - [x] - Storage
-    - [x] Create
-    - [x] Update
-    - [x] Delete
-- [x] Database Model & Schema
-- [x] Database Connection
-- [x] GraphQL Query & Mutation
-  - [x] Mutation
-    - [x] CreateFruitForFruitStorage
-    - [x] DeleteFruitFromFruitStorage
-    - [x] RemoveFruitFromFruitStorage
-    - [x] StoreFruitToFruitStorage
-    - [x] UpdateFruitForFruitStorage
-  - [x] Query
-    - [x] FindFruit
-- [x] GraphQL Schema
-- [x] GraphQL Resolver
-- [x] HTTP Server
-- [x] Unit Testing
-  - [x] CreateFruitForFruitStorage
-  - [x] DeleteFruitFromFruitStorage
-  - [x] RemoveFruitFromFruitStorage
-  - [x] StoreFruitToFruitStorage
-  - [x] UpdateFruitForFruitStorage
-  - [x] FindFruit
+This project is designed to manage fruits and their storage, implementing functionalities for creating, updating, and deleting fruit and storage entries. It uses domain-driven design (DDD) and follows the DDD Clean Architecture.
+
+## Tools
+
+### Linting and Formatting
+- [**BiomeJS**](https://biomejs.dev/): Ensures code quality by providing linting and formatting.
+
+### Delivery Mechanism
+- [**Upstash/Kafka**](https://console.upstash.com/kafka): Implements "**at least once delivery**" to guarantee message delivery.
+
+### Code Quality
+- [**Sonarlint**](https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarlint-vscode): A VSCode extension that detects and helps fix coding issues.
+
+### Testing
+- [**Jest**](https://jestjs.io/): A robust testing framework used for unit tests.
+
+### GraphQL
+- [**Nexus**](https://nexusjs.org/): A framework for building robust, type-safe GraphQL APIs.
+
+### Database
+- [**MongoDB**](https://www.mongodb.com/): A NoSQL database used for storing and managing data.
