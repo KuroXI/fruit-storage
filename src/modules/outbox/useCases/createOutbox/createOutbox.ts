@@ -8,14 +8,14 @@ import { OutboxEventName } from "../../domain/outboxEventName";
 import { OutboxId } from "../../domain/outboxId";
 import { OutboxPayload } from "../../domain/outboxPayload";
 import { OutboxProcessed } from "../../domain/outboxProcessed";
-import type { IOutboxRepository } from "../../repositories";
+import type { IOutboxRepo } from "../../repositories/outboxRepo";
 import type { CreateOutboxDTO } from "./createOutboxDTO";
 import type { CreateOutboxResponse } from "./createOutboxResponse";
 
 export class CreateOutbox implements UseCase<CreateOutboxDTO, CreateOutboxResponse> {
-	private _outboxRepository: IOutboxRepository;
+	private _outboxRepository: IOutboxRepo;
 
-	constructor(outboxRepository: IOutboxRepository) {
+	constructor(outboxRepository: IOutboxRepo) {
 		this._outboxRepository = outboxRepository;
 	}
 

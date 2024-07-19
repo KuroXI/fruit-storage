@@ -1,9 +1,9 @@
-import type { IOutboxRepository } from "../..";
-import type { OutboxModel } from "../../../../../shared/infrastructure/database/mongoose/models/Outbox";
-import type { Outbox } from "../../../domain/outbox";
-import { OutboxMapper } from "../../../mappers/outboxMapper";
+import type { OutboxModel } from "../../../../shared/infrastructure/database/mongoose/models/Outbox";
+import type { Outbox } from "../../domain/outbox";
+import { OutboxMapper } from "../../mappers/outboxMapper";
+import type { IOutboxRepo } from "../outboxRepo";
 
-export class OutboxRepository implements IOutboxRepository {
+export class OutboxRepository implements IOutboxRepo {
 	private _models: typeof OutboxModel;
 
 	constructor(models: typeof OutboxModel) {

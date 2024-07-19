@@ -4,14 +4,14 @@ import { FRUIT_UPDATE_EVENT_NAME } from "../../../fruit/domain/events/fruitUpdat
 import { FRUIT_STORAGE_CREATE_EVENT_NAME } from "../../../storage/domain/events/storageCreated";
 import { FRUIT_STORAGE_DELETE_EVENT_NAME } from "../../../storage/domain/events/storageDeleted";
 import { FRUIT_STORAGE_UPDATE_EVENT_NAME } from "../../../storage/domain/events/storageUpdated";
-import type { OutboxRepository } from "../../repositories/implementations/mongoose/outboxRepository";
+import type { IOutboxRepo } from "../../repositories/outboxRepo";
 import { outboxProducer } from "../producer";
 import type { IOutboxPayload } from "./processPayloadDTO";
 
 export class ProcessPayload implements IOutboxPayload {
-	private _outboxRepository: OutboxRepository;
+	private _outboxRepository: IOutboxRepo;
 
-	constructor(outboxRepository: OutboxRepository) {
+	constructor(outboxRepository: IOutboxRepo) {
 		this._outboxRepository = outboxRepository;
 	}
 

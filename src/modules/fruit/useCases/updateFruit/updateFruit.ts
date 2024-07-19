@@ -4,16 +4,16 @@ import type { UseCase } from "../../../../shared/core/UseCase";
 import type { Fruit } from "../../domain/fruit";
 import { FruitDescription } from "../../domain/fruitDescription";
 import { FruitName } from "../../domain/fruitName";
-import type { IFruitRepository } from "../../repositories";
+import type { IFruitRepo } from "../../repositories/fruitRepo";
 import type { UpdateFruitDTO } from "./updateFruitDTO";
 import { UpdateFruitErrors } from "./updateFruitErrors";
 import { UpdateFruitOutbox } from "./updateFruitOutbox";
 import type { UpdateFruitResponse } from "./updateFruitResponse";
 
 export class UpdateFruit implements UseCase<UpdateFruitDTO, UpdateFruitResponse> {
-	private _fruitRepository: IFruitRepository;
+	private _fruitRepository: IFruitRepo;
 
-	constructor(fruitRepository: IFruitRepository) {
+	constructor(fruitRepository: IFruitRepo) {
 		this._fruitRepository = fruitRepository;
 	}
 

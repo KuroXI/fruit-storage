@@ -1,4 +1,4 @@
-import { fruitRepository } from "../../repositories/implementations";
+import { fruitRepository } from "../../repositories";
 import { GetFruit } from "./getFruit";
 
 const getFruit = new GetFruit(fruitRepository);

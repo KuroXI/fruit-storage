@@ -3,15 +3,15 @@ import { Result, left, right } from "../../../../shared/core/Result";
 import type { UseCase } from "../../../../shared/core/UseCase";
 import type { Fruit } from "../../domain/fruit";
 import { FruitName } from "../../domain/fruitName";
-import type { IFruitRepository } from "../../repositories";
+import type { IFruitRepo } from "../../repositories/fruitRepo";
 import type { GetFruitDTO } from "./getFruitDTO";
 import { GetFruitErrors } from "./getFruitErrors";
 import type { GetFruitResponse } from "./getFruitResponse";
 
 export class GetFruit implements UseCase<GetFruitDTO, GetFruitResponse> {
-	private _fruitRepository: IFruitRepository;
+	private _fruitRepository: IFruitRepo;
 
-	constructor(fruitRepository: IFruitRepository) {
+	constructor(fruitRepository: IFruitRepo) {
 		this._fruitRepository = fruitRepository;
 	}
 

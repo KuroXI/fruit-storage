@@ -6,16 +6,16 @@ import { Fruit } from "../../domain/fruit";
 import { FruitDescription } from "../../domain/fruitDescription";
 import { FruitId } from "../../domain/fruitId";
 import { FruitName } from "../../domain/fruitName";
-import type { IFruitRepository } from "../../repositories";
+import type { IFruitRepo } from "../../repositories/fruitRepo";
 import type { CreateFruitDTO } from "./createFruitDTO";
 import { CreateFruitErrors } from "./createFruitErrors";
 import { CreateFruitOutbox } from "./createFruitOutbox";
 import type { CreateFruitResponse } from "./createFruitResponse";
 
 export class CreateFruit implements UseCase<CreateFruitDTO, CreateFruitResponse> {
-	private _fruitRepository: IFruitRepository;
+	private _fruitRepository: IFruitRepo;
 
-	constructor(fruitRepository: IFruitRepository) {
+	constructor(fruitRepository: IFruitRepo) {
 		this._fruitRepository = fruitRepository;
 	}
 
