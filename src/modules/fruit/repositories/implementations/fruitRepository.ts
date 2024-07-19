@@ -1,11 +1,11 @@
-import type { IFruitRepository } from "../../";
-import type { FruitModel } from "../../../../../shared/infrastructure/database/mongoose/models/Fruit";
-import type { Fruit } from "../../../domain/fruit";
-import type { FruitDescription } from "../../../domain/fruitDescription";
-import type { FruitName } from "../../../domain/fruitName";
-import { FruitMapper } from "../../../mappers/fruitMapper";
+import type { FruitModel } from "../../../../shared/infrastructure/database/mongoose/models/Fruit";
+import type { Fruit } from "../../domain/fruit";
+import type { FruitDescription } from "../../domain/fruitDescription";
+import type { FruitName } from "../../domain/fruitName";
+import { FruitMapper } from "../../mappers/fruitMapper";
+import type { IFruitRepo } from "../fruitRepo";
 
-export class FruitRepository implements IFruitRepository {
+export class FruitRepository implements IFruitRepo {
 	private _models: typeof FruitModel;
 
 	constructor(models: typeof FruitModel) {

@@ -3,14 +3,14 @@ import { Result, left, right } from "../../../../shared/core/Result";
 import type { UseCase } from "../../../../shared/core/UseCase";
 import type { Storage } from "../../domain/storage";
 import { StorageFruitId } from "../../domain/storageFruitId";
-import type { IStorageRepository } from "../../repositories";
+import type { IStorageRepo } from "../../repositories/storageRepo";
 import type { GetStorageDTO } from "./getStorageDTO";
 import type { GetStorageResponse } from "./getStorageResponse";
 
 export class GetStorage implements UseCase<GetStorageDTO, GetStorageResponse> {
-	private _storageRepository: IStorageRepository;
+	private _storageRepository: IStorageRepo;
 
-	constructor(storageRepository: IStorageRepository) {
+	constructor(storageRepository: IStorageRepo) {
 		this._storageRepository = storageRepository;
 	}
 

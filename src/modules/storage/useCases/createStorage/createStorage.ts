@@ -7,16 +7,16 @@ import { StorageAmount } from "../../domain/storageAmount";
 import { StorageFruitId } from "../../domain/storageFruitId";
 import { StorageId } from "../../domain/storageId";
 import { StorageLimit } from "../../domain/storageLimit";
-import type { IStorageRepository } from "../../repositories";
+import type { IStorageRepo } from "../../repositories/storageRepo";
 import type { CreateStorageDTO } from "./createStorageDTO";
 import { CreateStorageErrors } from "./createStorageErrors";
 import { CreateStorageOutbox } from "./createStorageOutbox";
 import type { CreateStorageResponse } from "./createStorageResponse";
 
 export class CreateStorage implements UseCase<CreateStorageDTO, CreateStorageResponse> {
-	private _storageRepository: IStorageRepository;
+	private _storageRepository: IStorageRepo;
 
-	constructor(storageRepository: IStorageRepository) {
+	constructor(storageRepository: IStorageRepo) {
 		this._storageRepository = storageRepository;
 	}
 

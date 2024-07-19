@@ -3,16 +3,16 @@ import { Result, left, right } from "../../../../shared/core/Result";
 import type { UseCase } from "../../../../shared/core/UseCase";
 import type { Storage } from "../../domain/storage";
 import { StorageFruitId } from "../../domain/storageFruitId";
-import type { IStorageRepository } from "../../repositories";
+import type { IStorageRepo } from "../../repositories/storageRepo";
 import type { DeleteStorageDTO } from "./deleteStorageDTO";
 import { DeleteStorageErrors } from "./deleteStorageErrors";
 import { DeleteStorageOutbox } from "./deleteStorageOutbox";
 import type { DeleteStorageResponse } from "./deleteStorageResponse";
 
 export class DeleteStorage implements UseCase<DeleteStorageDTO, DeleteStorageResponse> {
-	private _storageRepository: IStorageRepository;
+	private _storageRepository: IStorageRepo;
 
-	constructor(storageRepository: IStorageRepository) {
+	constructor(storageRepository: IStorageRepo) {
 		this._storageRepository = storageRepository;
 	}
 

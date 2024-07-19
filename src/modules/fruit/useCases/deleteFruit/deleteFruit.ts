@@ -3,16 +3,16 @@ import { Result, left, right } from "../../../../shared/core/Result";
 import type { UseCase } from "../../../../shared/core/UseCase";
 import type { Fruit } from "../../domain/fruit";
 import { FruitName } from "../../domain/fruitName";
-import type { IFruitRepository } from "../../repositories";
+import type { IFruitRepo } from "../../repositories/fruitRepo";
 import type { DeleteFruitDTO } from "./deleteFruitDTO";
 import { DeleteFruitErrors } from "./deleteFruitErrors";
 import { DeleteFruitOutbox } from "./deleteFruitOutbox";
 import type { DeleteFruitResponse } from "./deleteFruitResponse";
 
 export class DeleteFruit implements UseCase<DeleteFruitDTO, DeleteFruitResponse> {
-	private _fruitRepository: IFruitRepository;
+	private _fruitRepository: IFruitRepo;
 
-	constructor(fruitRepository: IFruitRepository) {
+	constructor(fruitRepository: IFruitRepo) {
 		this._fruitRepository = fruitRepository;
 	}
 

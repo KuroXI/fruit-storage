@@ -1,4 +1,4 @@
-import { storageRepository } from "../../repositories/implementations";
+import { storageRepository } from "../../repositories";
 import { GetStorage } from "./getStorage";
 
 const getStorage = new GetStorage(storageRepository);

@@ -1,7 +1,6 @@
-import type { Outbox } from "../domain/outbox";
+import { models } from "../../../shared/infrastructure/database/mongoose/models";
+import { OutboxRepository } from "./implementations/outboxRepository";
 
-export interface IOutboxRepository {
-	save(outbox: Outbox): Promise<void>;
-	getPendings(): Promise<Outbox[]>;
-	markAsProcessed(outbox: Outbox): Promise<void>;
-}
+const outboxRepository = new OutboxRepository(models.outbox);
+
+export { outboxRepository };

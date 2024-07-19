@@ -4,16 +4,16 @@ import type { UseCase } from "../../../../shared/core/UseCase";
 import type { Storage } from "../../domain/storage";
 import { StorageFruitId } from "../../domain/storageFruitId";
 import { StorageLimit } from "../../domain/storageLimit";
-import type { IStorageRepository } from "../../repositories";
+import type { IStorageRepo } from "../../repositories/storageRepo";
 import type { RemoveStorageDTO } from "./removeStorageDTO";
 import { RemoveStorageErrors } from "./removeStorageErrors";
 import { RemoveStorageOutbox } from "./removeStorageOutbox";
 import type { RemoveStorageResponse } from "./removeStorageResponse";
 
 export class RemoveStorage implements UseCase<RemoveStorageDTO, RemoveStorageResponse> {
-	private _storageRepository: IStorageRepository;
+	private _storageRepository: IStorageRepo;
 
-	constructor(storageRepository: IStorageRepository) {
+	constructor(storageRepository: IStorageRepo) {
 		this._storageRepository = storageRepository;
 	}
 

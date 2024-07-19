@@ -1,11 +1,6 @@
-import type { Fruit } from "../domain/fruit";
-import type { FruitDescription } from "../domain/fruitDescription";
-import type { FruitName } from "../domain/fruitName";
+import { models } from "../../../shared/infrastructure/database/mongoose/models";
+import { FruitRepository } from "./implementations/fruitRepository";
 
-export interface IFruitRepository {
-	exists(name: FruitName): Promise<boolean>;
-	save(fruit: Fruit): Promise<void>;
-	delete(name: FruitName): Promise<Fruit>;
-	update(name: FruitName, description: FruitDescription): Promise<Fruit>;
-	getFruit(name: FruitName): Promise<Fruit>;
-}
+const fruitRepository = new FruitRepository(models.fruit);
+
+export { fruitRepository };

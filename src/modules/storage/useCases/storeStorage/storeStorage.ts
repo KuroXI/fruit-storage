@@ -4,16 +4,16 @@ import type { UseCase } from "../../../../shared/core/UseCase";
 import type { Storage } from "../../domain/storage";
 import { StorageFruitId } from "../../domain/storageFruitId";
 import { StorageLimit } from "../../domain/storageLimit";
-import type { IStorageRepository } from "../../repositories";
+import type { IStorageRepo } from "../../repositories/storageRepo";
 import type { StoreStorageDTO } from "./storeStorageDTO";
 import { StoreStorageErrors } from "./storeStorageErrors";
 import { StoreStorageOutbox } from "./storeStorageOutbox";
 import type { StoreStorageResponse } from "./storeStorageResponse";
 
 export class StoreStorage implements UseCase<StoreStorageDTO, StoreStorageResponse> {
-	private _storageRepository: IStorageRepository;
+	private _storageRepository: IStorageRepo;
 
-	constructor(storageRepository: IStorageRepository) {
+	constructor(storageRepository: IStorageRepo) {
 		this._storageRepository = storageRepository;
 	}
 
