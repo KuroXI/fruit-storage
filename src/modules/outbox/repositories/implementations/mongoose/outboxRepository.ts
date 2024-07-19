@@ -1,5 +1,5 @@
 import type { IOutboxRepository } from "../..";
-import type { OutboxModel } from "../../../../../database/mongoose/models/Outbox";
+import type { OutboxModel } from "../../../../../shared/infrastructure/database/mongoose/models/Outbox";
 import type { Outbox } from "../../../domain/outbox";
 import { OutboxMapper } from "../../../mappers/outboxMapper";
 

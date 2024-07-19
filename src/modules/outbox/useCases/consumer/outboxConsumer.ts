@@ -1,6 +1,6 @@
 import type { Consumer } from "kafkajs";
-import type { IOutboxConsumer } from "../../..";
-import { kafkaConfig } from "../../../../../../config";
+import type { IOutboxConsumer } from "./outboxConsumerDTO";
+import { kafkaConfig } from "../../../../config";
 
 export class OutboxConsumer implements IOutboxConsumer {
 	private _consumer: Consumer;

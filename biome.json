@@ -5,7 +5,11 @@
 	},
 	"linter": {
 		"enabled": true,
-		"ignore": ["src/shared/core", "src/shared/domain"],
+		"ignore": [
+			"src/shared/core",
+			"src/shared/domain",
+			"src/shared/infrastructure/http/graphql/nexus"
+		],
 		"rules": {
 			"recommended": true,
 			"complexity": {
@@ -16,7 +20,7 @@
 	"formatter": {
 		"enabled": true,
 		"formatWithErrors": false,
-		"ignore": [],
+		"ignore": ["src/shared/infrastructure/http/graphql/nexus"],
 		"attributePosition": "auto",
 		"indentStyle": "tab",
 		"indentWidth": 2,

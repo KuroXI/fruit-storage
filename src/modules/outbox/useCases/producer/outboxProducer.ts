@@ -1,8 +1,8 @@
 import type { Producer } from "kafkajs";
-import type { IOutboxProcuder } from "../../..";
+import { kafkaConfig } from "../../../../config";
 import type { Outbox } from "../../domain/outbox";
 import { OutboxMapper } from "../../mappers/outboxMapper";
-import { kafkaConfig } from "../../../../../../config";
+import type { IOutboxProcuder } from "./outboxProducerDTO";
 
 export class OutboxProducer implements IOutboxProcuder<Outbox> {
 	private _producer: Producer;

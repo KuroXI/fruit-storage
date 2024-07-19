@@ -10,7 +10,8 @@
 		"lint:fix": "biome lint --write ./src",
 		"format": "biome format ./src",
 		"format:fix": "biome format --write ./src",
-		"test": "jest --config jest.config.ts --runInBand ./test"
+		"test": "jest --config jest.config.ts --runInBand ./test",
+		"check": "tsc --noEmit"
 	},
 	"keywords": [],
 	"author": "Victor Gonzales <vgonzales5157@gmail.com> (https://github.com/KuroXI)",

@@ -1,4 +1,4 @@
-import { UniqueEntityID } from "../../../../domain/UniqueEntityID";
+import { UniqueEntityID } from "../../../shared/domain/UniqueEntityID";
 import { Outbox } from "../domain/outbox";
 import { OutboxCreatedAt } from "../domain/outboxCreatedAt";
 import { OutboxEventName } from "../domain/outboxEventName";

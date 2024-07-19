@@ -1,11 +1,10 @@
-export interface IOutboxPayload {
-	execute(): Promise<void>;
-}
+import { Kafka, Partitioners } from "kafkajs";
+import { kafkaConfig } from "../../../config";
 
-export interface IOutboxProcuder<T> {
-	execute(payload: T): Promise<void>;
-}
+const kafka = new Kafka(kafkaConfig.clientConfig);
 
-export interface IOutboxConsumer {
-	execute(): Promise<void>;
-}
+const consumer = kafka.consumer({ groupId: "fruit-consumer" });
+
+const producer = kafka.producer({ createPartitioner: Partitioners.DefaultPartitioner });
+
+export { consumer, producer };
