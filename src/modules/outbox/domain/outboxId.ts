@@ -1,7 +1,7 @@
-import { Guard } from "../../../../core/Guard";
-import { Result } from "../../../../core/Result";
-import type { UniqueEntityID } from "../../../../domain/UniqueEntityID";
-import { ValueObject } from "../../../../domain/ValueObject";
+import { Guard } from "../../../shared/core/Guard";
+import { Result } from "../../../shared/core/Result";
+import type { UniqueEntityID } from "../../../shared/domain/UniqueEntityID";
+import { ValueObject } from "../../../shared/domain/ValueObject";
 
 export class OutboxId extends ValueObject<{ value: UniqueEntityID }> {
 	getStringValue(): string {

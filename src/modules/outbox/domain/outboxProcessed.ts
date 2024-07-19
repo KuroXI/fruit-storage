@@ -1,6 +1,6 @@
-import { Guard } from "../../../../core/Guard";
-import { Result } from "../../../../core/Result";
-import { ValueObject } from "../../../../domain/ValueObject";
+import { Guard } from "../../../shared/core/Guard";
+import { Result } from "../../../shared/core/Result";
+import { ValueObject } from "../../../shared/domain/ValueObject";
 
 interface OutboxProcessedProps {
 	value: boolean;

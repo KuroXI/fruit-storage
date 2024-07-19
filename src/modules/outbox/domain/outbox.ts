@@ -1,7 +1,7 @@
-import { Guard, type IGuardArgument } from "../../../../core/Guard";
-import { Result } from "../../../../core/Result";
-import { AggregateRoot } from "../../../../domain/AggregateRoot";
-import type { UniqueEntityID } from "../../../../domain/UniqueEntityID";
+import { Guard, type IGuardArgument } from "../../../shared/core/Guard";
+import { Result } from "../../../shared/core/Result";
+import { AggregateRoot } from "../../../shared/domain/AggregateRoot";
+import type { UniqueEntityID } from "../../../shared/domain/UniqueEntityID";
 import type { OutboxCreatedAt } from "./outboxCreatedAt";
 import type { OutboxEventName } from "./outboxEventName";
 import { OutboxId } from "./outboxId";

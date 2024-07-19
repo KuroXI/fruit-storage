@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import { cronConfig } from "../../../config";
-import { processPayload } from "../kafka/outbox/useCases/processPayload";
+import { processPayload } from "../../../modules/outbox/useCases/processPayload";
 
 cron.schedule(
 	cronConfig.interval,

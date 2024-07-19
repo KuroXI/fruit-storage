@@ -1,3 +1,8 @@
+[![wakatime](https://wakatime.com/badge/user/152d6023-67ff-4cb4-a5dc-21f42dcf7f47/project/3cedd4c5-d38a-4676-9d26-51299672d930.svg)](https://wakatime.com/badge/user/152d6023-67ff-4cb4-a5dc-21f42dcf7f47/project/3cedd4c5-d38a-4676-9d26-51299672d930)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=KuroXI_fruit-storage&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=KuroXI_fruit-storage)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=KuroXI_fruit-storage&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=KuroXI_fruit-storage)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=KuroXI_fruit-storage&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=KuroXI_fruit-storage)
+
 # Fruit Storage
 
 This project is designed to manage fruits and their storage, implementing functionalities for creating, updating, and deleting fruit and storage entries. It uses domain-driven design (DDD) and follows the DDD Clean Architecture.
