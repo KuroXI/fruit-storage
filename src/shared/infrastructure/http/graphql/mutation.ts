@@ -1,10 +1,10 @@
 import { booleanArg, intArg, mutationType, nonNull, stringArg } from "nexus";
+import type { NexusGenRootTypes } from "./nexus/types";
 import { createFruitForFruitStorageResolver } from "./resolver/createFruitForFruitStorageResolver";
 import { deleteFruitFromFruitStorageResolver } from "./resolver/deleteFruitFromFruitStorageResolver";
 import { removeFruitFromFruitStorageResolver } from "./resolver/removeFruitFromFruitStorageResolver";
 import { storeFruitToFruitStorageResolver } from "./resolver/storeFruitToFruitStorageResolver";
 import { updateFruitForFruitStorageResolver } from "./resolver/updateFruitForFruitStorageResolver";
-import type { NexusGenRootTypes } from "./nexus/types";
 
 export const mutation = mutationType({
 	definition(type) {

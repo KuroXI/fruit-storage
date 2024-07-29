@@ -6,11 +6,9 @@
 	"scripts": {
 		"dev": "nodemon",
 		"graphql:generate": "ts-node --transpile-only ./src/shared/infrastructure/http/graphql/schema.ts",
-		"lint": "biome lint ./src",
-		"lint:fix": "biome lint --write ./src",
-		"format": "biome format ./src",
-		"format:fix": "biome format --write ./src",
-		"test": "jest --config jest.config.ts --runInBand ./test",
+		"lint": "biome lint --write ./src",
+		"format": "biome format --write ./src",
+		"test": "jest --config jest.config.ts --runInBand",
 		"check": "tsc --noEmit"
 	},
 	"keywords": [],

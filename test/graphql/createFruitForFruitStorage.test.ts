@@ -48,8 +48,9 @@ describe("Fruit Creation Tests", () => {
 		// @ts-ignore
 		const { data, errors } = result.body.singleResult;
 
-		expect(errors).toBeTruthy();
-		expect(data).toBeFalsy();
+		expect(errors).toHaveLength(1);
+		expect(errors[0].message).toBe("Text is greater than 30 chars.");
+		expect(data).toBe(null);
 	});
 
 	it("should return an error due to duplication fruit entry", async () => {
@@ -65,7 +66,8 @@ describe("Fruit Creation Tests", () => {
 		// @ts-ignore
 		const { data, errors } = result.body.singleResult;
 
-		expect(errors).toBeTruthy();
-		expect(data).toBeFalsy();
+		expect(errors).toHaveLength(1);
+		expect(errors[0].message).toBe("The fruit name 'lemon' already exist!");
+		expect(data).toBe(null);
 	});
 });

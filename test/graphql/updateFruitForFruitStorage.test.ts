@@ -11,7 +11,7 @@ const seed = {
 	description: "this is a lemon",
 	limit: 10,
 	amount: 0,
-}
+};
 
 describe("Fruit Update Tests", () => {
 	beforeAll(async () => {
@@ -62,7 +62,8 @@ describe("Fruit Update Tests", () => {
 		// @ts-ignore
 		const { data, errors } = result.body.singleResult;
 
-		expect(errors).toBeTruthy();
-		expect(data).toBeFalsy();
+		expect(errors).toHaveLength(1);
+		expect(errors[0].message).toBe("Text is greater than 30 chars.");
+		expect(data).toBe(null);
 	});
 });

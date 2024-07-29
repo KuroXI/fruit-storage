@@ -1,5 +1,5 @@
-import { makeSchema, objectType } from "nexus";
 import path from "node:path";
+import { makeSchema, objectType } from "nexus";
 import { mutation } from "./mutation";
 import { query } from "./query";
 
