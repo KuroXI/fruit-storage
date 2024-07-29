@@ -7,11 +7,11 @@ import { seedFruitForFruitStorage } from "../seed/seedFruitForFruitStorage";
 import { closeConnection, connectToDatabase, dropAllCollection } from "../utils";
 
 const seed = {
-  name: "lemon",
-  description: "this is a lemon",
-  limit: 10,
-  amount: 5,
-}
+	name: "lemon",
+	description: "this is a lemon",
+	limit: 10,
+	amount: 5,
+};
 
 describe("Fruit Deletion Tests", () => {
 	beforeAll(async () => {
@@ -41,8 +41,11 @@ describe("Fruit Deletion Tests", () => {
 		// @ts-ignore
 		const { data, errors } = result.body.singleResult;
 
-		expect(errors).toBeTruthy();
-		expect(data).toBeFalsy();
+		expect(errors).toHaveLength(1);
+		expect(errors[0].message).toBe(
+			"Fruit cannot be deleted because it still has an amount stored.",
+		);
+		expect(data).toBe(null);
 	});
 
 	it("should successfully force delete a fruit", async () => {

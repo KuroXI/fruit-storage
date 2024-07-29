@@ -3,15 +3,15 @@ import { Result, left, right } from "../../../../shared/core/Result";
 import type { UseCase } from "../../../../shared/core/UseCase";
 import type { Fruit } from "../../domain/fruit";
 import { FruitName } from "../../domain/fruitName";
-import type { IFruitRepo } from "../../repositories/fruitRepo";
+import type { IFruitRepository } from "../../repositories/IFruitRepository";
 import type { GetFruitDTO } from "./getFruitDTO";
 import { GetFruitErrors } from "./getFruitErrors";
 import type { GetFruitResponse } from "./getFruitResponse";
 
 export class GetFruit implements UseCase<GetFruitDTO, GetFruitResponse> {
-	private _fruitRepository: IFruitRepo;
+	private _fruitRepository: IFruitRepository;
 
-	constructor(fruitRepository: IFruitRepo) {
+	constructor(fruitRepository: IFruitRepository) {
 		this._fruitRepository = fruitRepository;
 	}
 
@@ -21,7 +21,7 @@ export class GetFruit implements UseCase<GetFruitDTO, GetFruitResponse> {
 
 			const fruitCombineResult = Result.combine([fruitNameOrError]);
 			if (fruitCombineResult.isFailure) {
-				return left(Result.fail(fruitCombineResult.getErrorValue()));
+				return left(Result.fail<GetFruit>(fruitCombineResult.getErrorValue()));
 			}
 
 			const fruitAlreadyExists = await this._fruitRepository.exists(fruitNameOrError.getValue());

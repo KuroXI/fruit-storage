@@ -1,6 +1,6 @@
 import { nonNull, queryType, stringArg } from "nexus";
-import { findFruitResolver } from "./resolver/findFruit";
 import type { NexusGenRootTypes } from "./nexus/types";
+import { findFruitResolver } from "./resolver/findFruit";
 
 const query = queryType({
 	definition(type) {

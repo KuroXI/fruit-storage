@@ -3,6 +3,7 @@ import "dotenv/config";
 import { ApolloServer } from "@apollo/server";
 import fastifyApollo, { fastifyApolloDrainPlugin } from "@as-integrations/fastify";
 import Fastify from "fastify";
+import { connectDatabase } from "../database";
 import schema from "./graphql/schema";
 
 (async () => {
@@ -12,6 +13,8 @@ import schema from "./graphql/schema";
 		schema: schema,
 		plugins: [fastifyApolloDrainPlugin(fastify)],
 	});
+
+	await connectDatabase();
 
 	await apollo.start();
 

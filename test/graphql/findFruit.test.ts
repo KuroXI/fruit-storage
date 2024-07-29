@@ -11,7 +11,7 @@ const seed = {
 	description: "this is a lemon",
 	limit: 10,
 	amount: 0,
-}
+};
 
 describe("Find Fruit Tests", () => {
 	beforeAll(async () => {
@@ -40,8 +40,9 @@ describe("Find Fruit Tests", () => {
 		// @ts-ignore
 		const { data, errors } = result.body.singleResult;
 
-		expect(data).toBeTruthy();
 		expect(errors).toBeFalsy();
+		expect(data.findFruit).toBeTruthy();
+		expect(data.findFruit.fruit.name).toBe("lemon");
 	});
 
 	it("should return an error when the fruit is not found", async () => {
@@ -55,7 +56,8 @@ describe("Find Fruit Tests", () => {
 		// @ts-ignore
 		const { data, errors } = result.body.singleResult;
 
-		expect(errors).toBeTruthy();
-		expect(data.findFruit).toBeFalsy();
+		expect(errors).toHaveLength(1);
+		expect(errors[0].message).toBe("The fruit name 'not a lemon' does not exist!");
+		expect(data.findFruit).toBe(null);
 	});
 });

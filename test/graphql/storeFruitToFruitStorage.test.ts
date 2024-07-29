@@ -7,11 +7,11 @@ import { seedFruitForFruitStorage } from "../seed/seedFruitForFruitStorage";
 import { closeConnection, connectToDatabase, dropAllCollection } from "../utils";
 
 const seed = {
-  name: "lemon",
-  description: "this is a lemon",
-  limit: 10,
-  amount: 0,
-}
+	name: "lemon",
+	description: "this is a lemon",
+	limit: 10,
+	amount: 0,
+};
 
 describe("Fruit Store Tests", () => {
 	beforeAll(async () => {
@@ -29,12 +29,12 @@ describe("Fruit Store Tests", () => {
 
 	const apollo = new ApolloServer({ schema: schema });
 
-  it("should successfully store a fruit with an amount of 5", async () => {
+	it("should successfully store a fruit with an amount of 5", async () => {
 		const result = await apollo.executeOperation({
 			query: storeFruitToFruitStorageQuery,
 			variables: {
 				name: "lemon",
-				amount: 5
+				amount: 5,
 			},
 		});
 
@@ -44,7 +44,7 @@ describe("Fruit Store Tests", () => {
 		expect(errors).toBeFalsy();
 		expect(data.storeFruitToFruitStorage).toBeTruthy();
 		expect(data.storeFruitToFruitStorage.fruit.name).toBe("lemon");
-    expect(data.storeFruitToFruitStorage.amount).toBe(5);
+		expect(data.storeFruitToFruitStorage.amount).toBe(5);
 	});
 
 	it("should fail to store a fruit with an amount greater than the storage limit", async () => {
@@ -59,7 +59,8 @@ describe("Fruit Store Tests", () => {
 		// @ts-ignore
 		const { data, errors } = result.body.singleResult;
 
-		expect(errors).toBeTruthy();
-		expect(data).toBeFalsy();
+		expect(errors).toHaveLength(1);
+		expect(errors[0].message).toBe("The total amount exceeds the available storage limit.");
+		expect(data).toBe(null);
 	});
 });

@@ -25,6 +25,7 @@ export class StorageMapper {
 
 	public static toPersistence(storage: Storage) {
 		return {
+			id: storage.storageId.getValue(),
 			fruitId: storage.fruitId.value,
 			limit: storage.limit.value,
 			amount: storage.amount.value,

@@ -1,11 +1,11 @@
-import type { IStorageRepo } from "../storageRepo";
 import type { FruitStorageModel } from "../../../../shared/infrastructure/database/mongoose/models/FruitStorage";
 import type { Storage } from "../../domain/storage";
 import type { StorageFruitId } from "../../domain/storageFruitId";
 import type { StorageLimit } from "../../domain/storageLimit";
 import { StorageMapper } from "../../mappers/storageMapper";
+import type { IStorageRepository } from "../IStorageRepository";
 
-export class StorageRepository implements IStorageRepo {
+export class StorageRepository implements IStorageRepository {
 	private _models: typeof FruitStorageModel;
 
 	constructor(models: typeof FruitStorageModel) {
