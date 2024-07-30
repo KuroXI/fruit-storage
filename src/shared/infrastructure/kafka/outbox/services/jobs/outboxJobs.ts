@@ -1,47 +1,24 @@
-import { FRUIT_CREATE_EVENT_NAME } from "../../../../../../modules/fruit/domain/events/fruitCreated";
-import { FRUIT_DELETE_EVENT_NAME } from "../../../../../../modules/fruit/domain/events/fruitDeleted";
-import { FRUIT_UPDATE_EVENT_NAME } from "../../../../../../modules/fruit/domain/events/fruitUpdated";
-import { FRUIT_STORAGE_CREATE_EVENT_NAME } from "../../../../../../modules/storage/domain/events/storageCreated";
-import { FRUIT_STORAGE_DELETE_EVENT_NAME } from "../../../../../../modules/storage/domain/events/storageDeleted";
-import { FRUIT_STORAGE_UPDATE_EVENT_NAME } from "../../../../../../modules/storage/domain/events/storageUpdated";
-import type { OutboxRepository } from "../../repositories/implementations/outboxRepository";
+import type { Producer } from "kafkajs";
 import { outboxProducer } from "../producer";
 import type { IOutboxJobs } from "./IOutboxJobs";
 
 export class OutboxJobs implements IOutboxJobs {
-	private _outboxRepository: OutboxRepository;
+	private _producer: Producer;
 
-	constructor(outboxRepository: OutboxRepository) {
-		this._outboxRepository = outboxRepository;
+	constructor(producer: Producer) {
+		this._producer = producer;
 	}
 
 	async execute(): Promise<void> {
-		const validEventName = [
-			FRUIT_CREATE_EVENT_NAME,
-			FRUIT_UPDATE_EVENT_NAME,
-			FRUIT_DELETE_EVENT_NAME,
-			FRUIT_STORAGE_CREATE_EVENT_NAME,
-			FRUIT_STORAGE_UPDATE_EVENT_NAME,
-			FRUIT_STORAGE_DELETE_EVENT_NAME,
-		];
+		try {
+			await this._producer.connect();
 
-		const pendings = await this._outboxRepository.getPendings();
+			await outboxProducer.execute();
 
-		if (!pendings.length) return;
-
-		console.log("[WORKER] Processing unprocessed payload!");
-		for (const pending of pendings) {
-			try {
-				if (validEventName.includes(pending.eventName)) {
-					await outboxProducer.execute(pending);
-				} else {
-					throw new Error("Invalid Event Name");
-				}
-
-				await this._outboxRepository.markAsProcessed(pending);
-			} catch (error) {
-				console.error("Failed to process payload: ", error);
-			}
+			await this._producer.disconnect();
+		} catch (error) {
+			await this._producer.disconnect();
+			console.error("Error occur while processing outbox: ", error);
 		}
 	}
 }

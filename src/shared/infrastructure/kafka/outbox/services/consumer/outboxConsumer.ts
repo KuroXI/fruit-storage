@@ -11,15 +11,13 @@ export class OutboxConsumer implements IOutboxConsumer {
 
 	async execute(): Promise<void> {
 		await this._consumer.connect();
-		await this._consumer.subscribe({ topic: kafkaConfig.topicId });
+		await this._consumer.subscribe({ topic: kafkaConfig.topicId, fromBeginning: true });
 
 		await this._consumer.run({
-			eachMessage: async ({ message, partition }) => {
-				console.log({
-					partition,
-					offset: message.offset,
-					value: (message.value as Buffer).toString(),
-				});
+			eachMessage: async ({ message }) => {
+				console.log(
+					`[KAFKA] Successfully consume a payload: ${JSON.stringify(JSON.parse((message.value as Buffer).toString()))}`,
+				);
 			},
 		});
 	}

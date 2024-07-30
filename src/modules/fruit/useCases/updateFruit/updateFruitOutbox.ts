@@ -2,6 +2,7 @@ import { OutboxPayload } from "../../../../shared/infrastructure/kafka/outbox/ou
 import { outboxRepository } from "../../../../shared/infrastructure/kafka/outbox/repositories";
 import { FruitUpdated } from "../../domain/events/fruitUpdated";
 import type { Fruit } from "../../domain/fruit";
+import { FruitMapper } from "../../mappers/fruitMapper";
 
 export class UpdateFruitOutbox {
 	public static emit(fruit: Fruit) {
@@ -10,7 +11,7 @@ export class UpdateFruitOutbox {
 		const outboxPayloadOrError = OutboxPayload.create(
 			{
 				eventName: event.getEventName(),
-				payload: JSON.stringify(event.getPayload()),
+				payload: JSON.stringify(FruitMapper.toPersistence(event.getPayload())),
 				processed: false,
 				createdAt: event.getDateTimeOccurred(),
 			},
