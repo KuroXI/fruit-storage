@@ -1,32 +1,70 @@
 import type { Producer } from "kafkajs";
 import { kafkaConfig } from "../../../../../../config";
+import { FRUIT_CREATE_EVENT_NAME } from "../../../../../../modules/fruit/domain/events/fruitCreated";
+import { FRUIT_DELETE_EVENT_NAME } from "../../../../../../modules/fruit/domain/events/fruitDeleted";
+import { FRUIT_UPDATE_EVENT_NAME } from "../../../../../../modules/fruit/domain/events/fruitUpdated";
+import { FRUIT_STORAGE_CREATE_EVENT_NAME } from "../../../../../../modules/storage/domain/events/storageCreated";
+import { FRUIT_STORAGE_DELETE_EVENT_NAME } from "../../../../../../modules/storage/domain/events/storageDeleted";
+import { FRUIT_STORAGE_UPDATE_EVENT_NAME } from "../../../../../../modules/storage/domain/events/storageUpdated";
+import type { UnitOfWork } from "../../../../unitOfWork/implementations/UnitOfWork";
 import { OutboxMapper } from "../../mappers/outboxMapper";
 import type { OutboxPayload } from "../../outboxPayload";
+import type { OutboxRepository } from "../../repositories/implementations/outboxRepository";
 import type { IOutboxProcuder } from "./IOutboxProducer";
 
 export class OutboxProducer implements IOutboxProcuder<OutboxPayload> {
 	private _producer: Producer;
+	private _outboxRepository: OutboxRepository;
+	private _unitOfWork: UnitOfWork;
 
-	constructor(producer: Producer) {
+	constructor(producer: Producer, outboxRepository: OutboxRepository, unitOfWork: UnitOfWork) {
 		this._producer = producer;
+		this._outboxRepository = outboxRepository;
+		this._unitOfWork = unitOfWork;
 	}
 
-	async execute(payload: OutboxPayload): Promise<void> {
+	async execute(): Promise<void> {
+		const validEventNames = [
+			FRUIT_CREATE_EVENT_NAME,
+			FRUIT_UPDATE_EVENT_NAME,
+			FRUIT_DELETE_EVENT_NAME,
+			FRUIT_STORAGE_CREATE_EVENT_NAME,
+			FRUIT_STORAGE_UPDATE_EVENT_NAME,
+			FRUIT_STORAGE_DELETE_EVENT_NAME,
+		];
+
+		const transaction = await this._producer.transaction();
 		try {
-			await this._producer.connect();
+			const pendings = (await this._outboxRepository.getPendings()).filter((pending) =>
+				validEventNames.includes(pending.eventName),
+			);
+			if (!pendings.length) return await transaction.abort();
 
-			const records = await this._producer.send({
-				topic: kafkaConfig.topicId,
-				messages: [
-					{
-						key: payload.eventName,
-						value: JSON.stringify(OutboxMapper.toPersistence(payload)),
-					},
-				],
-			});
+			for (const pending of pendings) {
+				try {
+					await this._unitOfWork.start();
 
-			console.log(`[KAFKA] Successfully produce a payload: ${JSON.stringify(records)}`);
+					const record = await transaction.send({
+						topic: kafkaConfig.topicId,
+						messages: [
+							{
+								key: pending.eventName,
+								value: JSON.stringify(OutboxMapper.toPersistence(pending)),
+							},
+						],
+					});
+
+					await this._outboxRepository.markAsProcessed(pending);
+					await this._unitOfWork.commit();
+					console.log(`[KAFKA] Successfully produce a payload: ${JSON.stringify(record)}`);
+				} catch {
+					await this._unitOfWork.abort();
+				}
+			}
+
+			await transaction.commit();
 		} catch (error) {
+			await transaction.abort();
 			console.error("Something went wrong while producing", error);
 		}
 	}

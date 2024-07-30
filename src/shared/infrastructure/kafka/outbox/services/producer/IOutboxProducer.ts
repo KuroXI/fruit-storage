@@ -1,3 +1,3 @@
 export interface IOutboxProcuder<T> {
-	execute(payload: T): Promise<void>;
+	execute(payloads: T[]): Promise<void>;
 }

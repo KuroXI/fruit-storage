@@ -7,7 +7,7 @@ import { connectDatabase } from "../database";
 import schema from "./graphql/schema";
 
 (async () => {
-	const fastify = Fastify();
+	const fastify = Fastify({ logger: true });
 
 	const apollo = new ApolloServer({
 		schema: schema,

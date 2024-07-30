@@ -2,6 +2,7 @@ import { OutboxPayload } from "../../../../shared/infrastructure/kafka/outbox/ou
 import { outboxRepository } from "../../../../shared/infrastructure/kafka/outbox/repositories";
 import { StorageUpdated } from "../../domain/events/storageUpdated";
 import type { Storage } from "../../domain/storage";
+import { StorageMapper } from "../../mappers/storageMapper";
 
 export class StoreStorageOutbox {
 	public static emit(storage: Storage) {
@@ -10,7 +11,7 @@ export class StoreStorageOutbox {
 		const outboxPayloadOrError = OutboxPayload.create(
 			{
 				eventName: event.getEventName(),
-				payload: JSON.stringify(event.getPayload()),
+				payload: JSON.stringify(StorageMapper.toPersistence(event.getPayload())),
 				processed: false,
 				createdAt: event.getDateTimeOccurred(),
 			},
