@@ -1,12 +1,12 @@
 import cron from "node-cron";
 import { cronConfig } from "../../../config";
-import { outboxProducer } from "../kafka/outbox/services/producer";
+import { outboxJobs } from "../kafka/outbox/services/jobs";
 
 cron.schedule(
 	cronConfig.interval,
 	async () => {
 		try {
-			await outboxProducer.execute();
+			await outboxJobs.execute();
 		} catch (error) {
 			console.error("Error occur while processing outbox: ", error);
 		}

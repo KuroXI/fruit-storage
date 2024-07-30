@@ -40,31 +40,27 @@ export class OutboxProducer implements IOutboxProcuder<OutboxPayload> {
 			);
 			if (!pendings.length) return await transaction.abort();
 
+			await this._unitOfWork.start();
+
 			for (const pending of pendings) {
-				try {
-					await this._unitOfWork.start();
+				await transaction.send({
+					topic: kafkaConfig.topicId,
+					messages: [
+						{
+							key: pending.eventName,
+							value: JSON.stringify(OutboxMapper.toPersistence(pending)),
+						},
+					],
+				});
 
-					const record = await transaction.send({
-						topic: kafkaConfig.topicId,
-						messages: [
-							{
-								key: pending.eventName,
-								value: JSON.stringify(OutboxMapper.toPersistence(pending)),
-							},
-						],
-					});
-
-					await this._outboxRepository.markAsProcessed(pending);
-					await this._unitOfWork.commit();
-					console.log(`[KAFKA] Successfully produce a payload: ${JSON.stringify(record)}`);
-				} catch {
-					await this._unitOfWork.abort();
-				}
+				await this._outboxRepository.markAsProcessed(pending);
 			}
 
 			await transaction.commit();
+			await this._unitOfWork.commit();
 		} catch (error) {
 			await transaction.abort();
+			await this._unitOfWork.abort();
 			console.error("Something went wrong while producing", error);
 		}
 	}

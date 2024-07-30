@@ -11,6 +11,9 @@ const kafkaConfig = {
 			username: process.env.KAFKA_USERNAME as string,
 			password: process.env.KAFKA_PASSWORD as string,
 		},
+		retry: {
+			
+		}
 	} as KafkaConfig,
 };
 
