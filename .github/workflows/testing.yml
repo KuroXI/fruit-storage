@@ -31,9 +31,9 @@ jobs:
         uses: willcaul/jest-github-action@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MONGODB_URL: ${{ env.MONGODB_URL }}
-          KAFKA_ENDPOINT: ${{ env.KAFKA_ENDPOINT }}
-          KAFKA_USERNAME: ${{ env.KAFKA_USERNAME }}
-          KAFKA_PASSWORD: ${{ env.KAFKA_PASSWORD }}
+          MONGODB_URL: ${{ vars.MONGODB_URL }}
+          KAFKA_ENDPOINT: ${{ vars.KAFKA_ENDPOINT }}
+          KAFKA_USERNAME: ${{ vars.KAFKA_USERNAME }}
+          KAFKA_PASSWORD: ${{ vars.KAFKA_PASSWORD }}
         with:
           test-command: "pnpm test"
