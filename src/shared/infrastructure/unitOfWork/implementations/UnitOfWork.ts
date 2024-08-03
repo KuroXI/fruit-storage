@@ -8,24 +8,24 @@ export class UnitOfWork implements IUnitOfWork {
 		return this._session;
 	}
 
-	async start(): Promise<void> {
+	async startTransaction(): Promise<void> {
 		this._session = await startSession();
 		this._session?.startTransaction();
 	}
 
-	async commit(): Promise<void> {
+	async commitTransaction(): Promise<void> {
 		if (this._session) {
 			await this._session.commitTransaction();
 		}
 	}
 
-	async abort(): Promise<void> {
+	async abortTransaction(): Promise<void> {
 		if (this._session) {
 			await this._session.abortTransaction();
 		}
 	}
 
-	async end(): Promise<void> {
+	async endTransaction(): Promise<void> {
 		this._session?.endSession();
 	}
 }

@@ -1,5 +1,5 @@
 export interface IUnitOfWork {
-	start(): Promise<void>;
-	commit(): Promise<void>;
-	abort(): Promise<void>;
+	startTransaction(): Promise<void>;
+	commitTransaction(): Promise<void>;
+	abortTransaction(): Promise<void>;
 }
