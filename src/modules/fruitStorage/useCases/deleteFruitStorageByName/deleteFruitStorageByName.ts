@@ -4,9 +4,10 @@ import type { UseCase } from "../../../../shared/core/UseCase";
 import type { UnitOfWork } from "../../../../shared/infrastructure/unitOfWork/implementations/UnitOfWork";
 import type { Fruit } from "../../domain/fruit";
 import { FruitName } from "../../domain/fruitName";
-import { FruitStorage } from "../../domain/fruitStorage";
+import type { FruitStorage } from "../../domain/fruitStorage";
 import type { Storage } from "../../domain/storage";
 import { StorageFruitId } from "../../domain/storageFruitId";
+import { FruitStorageFactory } from "../../factory/fruitStorageFactory";
 import type { FruitRepository } from "../../repositories/implementations/fruitRepository";
 import type { StorageRepository } from "../../repositories/implementations/storageRepository";
 import type { IDeleteFruitStorageByNameDTO } from "./deleteFruitStorageByNameDTO";
@@ -14,12 +15,18 @@ import { DeleteFruitStorageByNameErrors } from "./deleteFruitStorageByNameErrors
 import { DeleteFruitStorageByNameOutbox } from "./deleteFruitStorageByNameOutbox";
 import type { DeleteFruitStorageByNameResponse } from "./deleteFruitStorageByNameResponse";
 
-export class DeleteFruitStorageByName implements UseCase<IDeleteFruitStorageByNameDTO, DeleteFruitStorageByNameResponse> {
+export class DeleteFruitStorageByName
+	implements UseCase<IDeleteFruitStorageByNameDTO, DeleteFruitStorageByNameResponse>
+{
 	private _fruitRepository: FruitRepository;
 	private _storageRepository: StorageRepository;
 	private _unitOfWork: UnitOfWork;
 
-	constructor(fruitRepository: FruitRepository, storageRepository: StorageRepository, unitOfWork: UnitOfWork) {
+	constructor(
+		fruitRepository: FruitRepository,
+		storageRepository: StorageRepository,
+		unitOfWork: UnitOfWork,
+	) {
 		this._fruitRepository = fruitRepository;
 		this._storageRepository = storageRepository;
 		this._unitOfWork = unitOfWork;
@@ -29,7 +36,9 @@ export class DeleteFruitStorageByName implements UseCase<IDeleteFruitStorageByNa
 		try {
 			await this._unitOfWork.startTransaction();
 
-			const validateRequestFruitData = await this._validateRequestFruitData({ name: request.name });
+			const validateRequestFruitData = await this._validateRequestFruitData({
+				name: request.name,
+			});
 			if (validateRequestFruitData.isFailure) {
 				return left(validateRequestFruitData);
 			}
@@ -44,18 +53,20 @@ export class DeleteFruitStorageByName implements UseCase<IDeleteFruitStorageByNa
 				return left(validateRequestStorageData);
 			}
 
-			const storage = await this._deleteStorageByFruitId(validateRequestStorageData.getValue().fruitId);
+			const storage = await this._deleteStorageByFruitId(
+				validateRequestStorageData.getValue().fruitId,
+			);
 
 			const fruitStorageOrError = await this._createFruitStorage(fruit, storage);
-      if (fruitStorageOrError.isFailure) {
-        return left(fruitStorageOrError);
-      }
+			if (fruitStorageOrError.isFailure) {
+				return left(fruitStorageOrError);
+			}
 
 			await this._emitOutboxEvent(fruitStorageOrError.getValue());
 
 			await this._unitOfWork.commitTransaction();
 
-      return right(Result.ok<FruitStorage>(fruitStorageOrError.getValue()));
+			return right(Result.ok<FruitStorage>(fruitStorageOrError.getValue()));
 		} catch (error) {
 			await this._unitOfWork.abortTransaction();
 			return left(new AppError.UnexpectedError(error));
@@ -64,7 +75,9 @@ export class DeleteFruitStorageByName implements UseCase<IDeleteFruitStorageByNa
 		}
 	}
 
-	private async _validateRequestFruitData(request: { name: string }): Promise<Result<{ name: FruitName }>> {
+	private async _validateRequestFruitData(request: { name: string }): Promise<
+		Result<{ name: FruitName }>
+	> {
 		const fruitNameOrError = FruitName.create({ value: request.name });
 		if (fruitNameOrError.isFailure) {
 			return Result.fail(fruitNameOrError.getErrorValue().toString());
@@ -73,8 +86,9 @@ export class DeleteFruitStorageByName implements UseCase<IDeleteFruitStorageByNa
 		const fruitExist = await this._isFruitExist(fruitNameOrError.getValue());
 		if (!fruitExist) {
 			return Result.fail(
-				new DeleteFruitStorageByNameErrors.FruitDoesNotExistError(fruitNameOrError.getValue().value).getErrorValue()
-					.message,
+				new DeleteFruitStorageByNameErrors.FruitDoesNotExistError(
+					fruitNameOrError.getValue().value,
+				).getErrorValue().message,
 			);
 		}
 
@@ -85,7 +99,9 @@ export class DeleteFruitStorageByName implements UseCase<IDeleteFruitStorageByNa
 		fruitId: string;
 		forceDelete: boolean;
 	}): Promise<Result<{ fruitId: StorageFruitId }>> {
-		const storageFruitIdOrError = StorageFruitId.create({ value: request.fruitId });
+		const storageFruitIdOrError = StorageFruitId.create({
+			value: request.fruitId,
+		});
 		if (storageFruitIdOrError.isFailure) {
 			return Result.fail(storageFruitIdOrError.getErrorValue().toString());
 		}
@@ -94,12 +110,15 @@ export class DeleteFruitStorageByName implements UseCase<IDeleteFruitStorageByNa
 
 		if (!storage) {
 			return Result.fail(
-				new DeleteFruitStorageByNameErrors.StorageDoesNotExistError(request.fruitId).getErrorValue().message,
+				new DeleteFruitStorageByNameErrors.StorageDoesNotExistError(request.fruitId).getErrorValue()
+					.message,
 			);
 		}
 
 		if (storage.amount.value > 0 && !request.forceDelete) {
-			return Result.fail(new DeleteFruitStorageByNameErrors.StorageHasAmountError().getErrorValue().message);
+			return Result.fail(
+				new DeleteFruitStorageByNameErrors.StorageHasAmountError().getErrorValue().message,
+			);
 		}
 
 		return Result.ok({
@@ -108,15 +127,7 @@ export class DeleteFruitStorageByName implements UseCase<IDeleteFruitStorageByNa
 	}
 
 	private async _createFruitStorage(fruit: Fruit, storage: Storage): Promise<Result<FruitStorage>> {
-		const fruitStorageOrError = FruitStorage.create(
-			{ fruit, limit: storage.limit, amount: storage.amount },
-			storage.storageId.getValue(),
-		);
-		if (fruitStorageOrError.isFailure) {
-			return Result.fail(fruitStorageOrError.getErrorValue().toString());
-		}
-
-		return Result.ok<FruitStorage>(fruitStorageOrError.getValue());
+		return FruitStorageFactory.create({ fruit, storage });
 	}
 
 	private async _deleteFruitByName(name: FruitName): Promise<Fruit> {
@@ -136,6 +147,6 @@ export class DeleteFruitStorageByName implements UseCase<IDeleteFruitStorageByNa
 	}
 
 	private async _emitOutboxEvent(fruitStorage: FruitStorage): Promise<void> {
-		DeleteFruitStorageByNameOutbox.emit(fruitStorage);
+		await DeleteFruitStorageByNameOutbox.emit(fruitStorage);
 	}
 }

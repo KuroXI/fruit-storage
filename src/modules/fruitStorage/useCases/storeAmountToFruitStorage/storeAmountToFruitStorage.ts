@@ -4,10 +4,11 @@ import type { UseCase } from "../../../../shared/core/UseCase";
 import type { UnitOfWork } from "../../../../shared/infrastructure/unitOfWork/implementations/UnitOfWork";
 import type { Fruit } from "../../domain/fruit";
 import { FruitName } from "../../domain/fruitName";
-import { FruitStorage } from "../../domain/fruitStorage";
+import type { FruitStorage } from "../../domain/fruitStorage";
 import type { Storage } from "../../domain/storage";
 import { StorageAmount } from "../../domain/storageAmount";
 import { StorageFruitId } from "../../domain/storageFruitId";
+import { FruitStorageFactory } from "../../factory/fruitStorageFactory";
 import type { FruitRepository } from "../../repositories/implementations/fruitRepository";
 import type { StorageRepository } from "../../repositories/implementations/storageRepository";
 import type { IStoreAmountToFruitStorageDTO } from "./storeAmountToFruitStorageDTO";
@@ -22,17 +23,25 @@ export class StoreAmountToFruitStorage
 	private _storageRepository: StorageRepository;
 	private _unitOfWork: UnitOfWork;
 
-	constructor(fruitRepository: FruitRepository, storageRepository: StorageRepository, unitOfWork: UnitOfWork) {
+	constructor(
+		fruitRepository: FruitRepository,
+		storageRepository: StorageRepository,
+		unitOfWork: UnitOfWork,
+	) {
 		this._fruitRepository = fruitRepository;
 		this._storageRepository = storageRepository;
 		this._unitOfWork = unitOfWork;
 	}
 
-	async execute(request: IStoreAmountToFruitStorageDTO): Promise<StoreAmountToFruitStorageResponse> {
+	async execute(
+		request: IStoreAmountToFruitStorageDTO,
+	): Promise<StoreAmountToFruitStorageResponse> {
 		try {
 			await this._unitOfWork.startTransaction();
 
-			const validateRequestFruitData = await this._validateRequestFruitData({ name: request.name });
+			const validateRequestFruitData = await this._validateRequestFruitData({
+				name: request.name,
+			});
 			if (validateRequestFruitData.isFailure) {
 				return left(validateRequestFruitData);
 			}
@@ -50,7 +59,7 @@ export class StoreAmountToFruitStorage
 			const { fruitId, amount } = validateRequestStorageData.getValue();
 			const storage = await this._storeAmountByFruitId(fruitId, amount);
 
-			const fruitStorageOrError = await this._createFruitStorage(fruit, storage);
+			const fruitStorageOrError = this._createFruitStorage(fruit, storage);
 			if (fruitStorageOrError.isFailure) {
 				return left(fruitStorageOrError);
 			}
@@ -68,7 +77,9 @@ export class StoreAmountToFruitStorage
 		}
 	}
 
-	private async _validateRequestFruitData(request: { name: string }): Promise<Result<{ name: FruitName }>> {
+	private async _validateRequestFruitData(request: { name: string }): Promise<
+		Result<{ name: FruitName }>
+	> {
 		const fruitNameOrError = FruitName.create({ value: request.name });
 		if (fruitNameOrError.isFailure) {
 			return Result.fail(fruitNameOrError.getErrorValue().toString());
@@ -77,8 +88,9 @@ export class StoreAmountToFruitStorage
 		const fruitExist = await this._isFruitExist(fruitNameOrError.getValue());
 		if (!fruitExist) {
 			return Result.fail(
-				new StoreAmountToFruitStorageErrors.FruitDoesNotExistError(fruitNameOrError.getValue().value).getErrorValue()
-					.message,
+				new StoreAmountToFruitStorageErrors.FruitDoesNotExistError(
+					fruitNameOrError.getValue().value,
+				).getErrorValue().message,
 			);
 		}
 
@@ -94,8 +106,12 @@ export class StoreAmountToFruitStorage
 			amount: StorageAmount;
 		}>
 	> {
-		const storageFruitIdOrError = StorageFruitId.create({ value: request.fruitId });
-		const storageAmountOrError = StorageAmount.create({ value: request.amount });
+		const storageFruitIdOrError = StorageFruitId.create({
+			value: request.fruitId,
+		});
+		const storageAmountOrError = StorageAmount.create({
+			value: request.amount,
+		});
 
 		const storageCombineResult = Result.combine([storageFruitIdOrError, storageAmountOrError]);
 		if (storageCombineResult.isFailure) {
@@ -106,13 +122,17 @@ export class StoreAmountToFruitStorage
 
 		if (!storage) {
 			return Result.fail(
-				new StoreAmountToFruitStorageErrors.StorageDoesNotExistError(request.fruitId).getErrorValue().message,
+				new StoreAmountToFruitStorageErrors.StorageDoesNotExistError(
+					request.fruitId,
+				).getErrorValue().message,
 			);
 		}
 
 		const amount = storage.amount.value + storageAmountOrError.getValue().value;
 		if (this._isAmountLaterThanLimit(amount, storage.limit.value)) {
-			return Result.fail(new StoreAmountToFruitStorageErrors.AmountLargerThanLimitError().getErrorValue().message);
+			return Result.fail(
+				new StoreAmountToFruitStorageErrors.AmountLargerThanLimitError().getErrorValue().message,
+			);
 		}
 
 		return Result.ok({
@@ -121,19 +141,14 @@ export class StoreAmountToFruitStorage
 		});
 	}
 
-	private async _createFruitStorage(fruit: Fruit, storage: Storage): Promise<Result<FruitStorage>> {
-		const fruitStorageOrError = FruitStorage.create(
-			{ fruit, limit: storage.limit, amount: storage.amount },
-			storage.storageId.getValue(),
-		);
-		if (fruitStorageOrError.isFailure) {
-			return Result.fail(fruitStorageOrError.getErrorValue().toString());
-		}
-
-		return Result.ok<FruitStorage>(fruitStorageOrError.getValue());
+	private _createFruitStorage(fruit: Fruit, storage: Storage): Result<FruitStorage> {
+		return FruitStorageFactory.create({ fruit, storage });
 	}
 
-	private async _storeAmountByFruitId(fruitId: StorageFruitId, amount: StorageAmount): Promise<Storage> {
+	private async _storeAmountByFruitId(
+		fruitId: StorageFruitId,
+		amount: StorageAmount,
+	): Promise<Storage> {
 		return await this._storageRepository.storeAmountByFruitId(fruitId, amount);
 	}
 
@@ -154,6 +169,6 @@ export class StoreAmountToFruitStorage
 	}
 
 	private async _emitOutboxEvent(fruitStorage: FruitStorage): Promise<void> {
-		StoreAmountToFruitStorageOutbox.emit(fruitStorage);
+		await StoreAmountToFruitStorageOutbox.emit(fruitStorage);
 	}
 }

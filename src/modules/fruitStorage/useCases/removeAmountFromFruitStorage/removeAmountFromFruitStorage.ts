@@ -4,10 +4,11 @@ import type { UseCase } from "../../../../shared/core/UseCase";
 import type { UnitOfWork } from "../../../../shared/infrastructure/unitOfWork/implementations/UnitOfWork";
 import type { Fruit } from "../../domain/fruit";
 import { FruitName } from "../../domain/fruitName";
-import { FruitStorage } from "../../domain/fruitStorage";
+import type { FruitStorage } from "../../domain/fruitStorage";
 import type { Storage } from "../../domain/storage";
 import { StorageAmount } from "../../domain/storageAmount";
 import { StorageFruitId } from "../../domain/storageFruitId";
+import { FruitStorageFactory } from "../../factory/fruitStorageFactory";
 import type { FruitRepository } from "../../repositories/implementations/fruitRepository";
 import type { StorageRepository } from "../../repositories/implementations/storageRepository";
 import type { IRemoveAmountFromFruitStorageDTO } from "./removeAmountFromFruitStorageDTO";
@@ -38,7 +39,9 @@ export class RemoveAmountFromFruitStorage
 		try {
 			await this._unitOfWork.startTransaction();
 
-			const validateRequestFruitData = await this._validateRequestFruitData({ name: request.name });
+			const validateRequestFruitData = await this._validateRequestFruitData({
+				name: request.name,
+			});
 			if (validateRequestFruitData.isFailure) {
 				return left(validateRequestFruitData);
 			}
@@ -57,9 +60,9 @@ export class RemoveAmountFromFruitStorage
 			const storage = await this._removeAmountByFruitId(fruitId, amount);
 
 			const fruitStorageOrError = await this._createFruitStorage(fruit, storage);
-      if (fruitStorageOrError.isFailure) {
-        return left(fruitStorageOrError);
-      }
+			if (fruitStorageOrError.isFailure) {
+				return left(fruitStorageOrError);
+			}
 
 			await this._emitOutboxEvent(fruitStorageOrError.getValue());
 
@@ -103,8 +106,12 @@ export class RemoveAmountFromFruitStorage
 			amount: StorageAmount;
 		}>
 	> {
-		const storageFruitIdOrError = StorageFruitId.create({ value: request.fruitId });
-		const storageAmountOrError = StorageAmount.create({ value: request.amount });
+		const storageFruitIdOrError = StorageFruitId.create({
+			value: request.fruitId,
+		});
+		const storageAmountOrError = StorageAmount.create({
+			value: request.amount,
+		});
 
 		const storageCombineResult = Result.combine([storageFruitIdOrError, storageAmountOrError]);
 		if (storageCombineResult.isFailure) {
@@ -135,15 +142,7 @@ export class RemoveAmountFromFruitStorage
 	}
 
 	private async _createFruitStorage(fruit: Fruit, storage: Storage): Promise<Result<FruitStorage>> {
-		const fruitStorageOrError = FruitStorage.create(
-			{ fruit, limit: storage.limit, amount: storage.amount },
-			storage.storageId.getValue(),
-		);
-		if (fruitStorageOrError.isFailure) {
-			return Result.fail(fruitStorageOrError.getErrorValue().toString());
-		}
-
-		return Result.ok<FruitStorage>(fruitStorageOrError.getValue());
+		return FruitStorageFactory.create({ fruit, storage });
 	}
 
 	private async _removeAmountByFruitId(
@@ -166,6 +165,6 @@ export class RemoveAmountFromFruitStorage
 	}
 
 	private async _emitOutboxEvent(fruitStorage: FruitStorage): Promise<void> {
-		RemoveAmountFromFruitStorageOutbox.emit(fruitStorage);
+		await RemoveAmountFromFruitStorageOutbox.emit(fruitStorage);
 	}
 }

@@ -5,7 +5,7 @@ import type { FruitStorage } from "../../domain/fruitStorage";
 import { FruitStorageMapper } from "../../mappers/fruitStorageMapper";
 
 export class StoreAmountToFruitStorageOutbox {
-	public static emit(fruitStorage: FruitStorage) {
+	public static async emit(fruitStorage: FruitStorage) {
 		const event = new FruitStorageUpdated(fruitStorage);
 
 		const outboxPayloadOrError = OutboxPayload.create(
@@ -20,6 +20,6 @@ export class StoreAmountToFruitStorageOutbox {
 
 		if (outboxPayloadOrError.isFailure) throw new Error();
 
-		outboxRepository.sendPayload(outboxPayloadOrError.getValue());
+		await outboxRepository.sendPayload(outboxPayloadOrError.getValue());
 	}
 }

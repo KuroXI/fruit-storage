@@ -3,16 +3,19 @@ import { Result, left, right } from "../../../../shared/core/Result";
 import type { UseCase } from "../../../../shared/core/UseCase";
 import type { Fruit } from "../../domain/fruit";
 import { FruitName } from "../../domain/fruitName";
-import { FruitStorage } from "../../domain/fruitStorage";
+import type { FruitStorage } from "../../domain/fruitStorage";
 import type { Storage } from "../../domain/storage";
 import { StorageFruitId } from "../../domain/storageFruitId";
+import { FruitStorageFactory } from "../../factory/fruitStorageFactory";
 import type { FruitRepository } from "../../repositories/implementations/fruitRepository";
 import type { StorageRepository } from "../../repositories/implementations/storageRepository";
 import type { IFindFruitStorageByNameDTO } from "./findFruitStorageByNameDTO";
 import { FindFruitStorageByNameErrors } from "./findFruitStorageByNameErrors";
 import type { FindFruitStorageByNameResponse } from "./findFruitStorageByNameResponse";
 
-export class FindFruitStorageByName implements UseCase<IFindFruitStorageByNameDTO, FindFruitStorageByNameResponse> {
+export class FindFruitStorageByName
+	implements UseCase<IFindFruitStorageByNameDTO, FindFruitStorageByNameResponse>
+{
 	private _fruitRepository: FruitRepository;
 	private _storageRepository: StorageRepository;
 
@@ -23,7 +26,9 @@ export class FindFruitStorageByName implements UseCase<IFindFruitStorageByNameDT
 
 	async execute(request: IFindFruitStorageByNameDTO): Promise<FindFruitStorageByNameResponse> {
 		try {
-			const validateRequestFruitData = await this._validateRequestFruitData({ name: request.name });
+			const validateRequestFruitData = await this._validateRequestFruitData({
+				name: request.name,
+			});
 			if (validateRequestFruitData.isFailure) {
 				return left(validateRequestFruitData);
 			}
@@ -37,7 +42,9 @@ export class FindFruitStorageByName implements UseCase<IFindFruitStorageByNameDT
 				return left(validateRequestStorageData);
 			}
 
-			const storage = await this._getStorageByFruitId(validateRequestStorageData.getValue().fruitId);
+			const storage = await this._getStorageByFruitId(
+				validateRequestStorageData.getValue().fruitId,
+			);
 
 			const fruitStorageOrError = await this._createFruitStorage(fruit, storage);
 			if (fruitStorageOrError.isFailure) {
@@ -50,7 +57,9 @@ export class FindFruitStorageByName implements UseCase<IFindFruitStorageByNameDT
 		}
 	}
 
-	private async _validateRequestFruitData(request: { name: string }): Promise<Result<{ name: FruitName }>> {
+	private async _validateRequestFruitData(request: { name: string }): Promise<
+		Result<{ name: FruitName }>
+	> {
 		const fruitNameOrError = FruitName.create({ value: request.name });
 		if (fruitNameOrError.isFailure) {
 			return Result.fail(fruitNameOrError.getErrorValue().toString());
@@ -59,18 +68,21 @@ export class FindFruitStorageByName implements UseCase<IFindFruitStorageByNameDT
 		const fruitExist = await this._isFruitExist(fruitNameOrError.getValue());
 		if (!fruitExist) {
 			return Result.fail(
-				new FindFruitStorageByNameErrors.FruitDoesNotExistError(fruitNameOrError.getValue().value).getErrorValue()
-					.message,
+				new FindFruitStorageByNameErrors.FruitDoesNotExistError(
+					fruitNameOrError.getValue().value,
+				).getErrorValue().message,
 			);
 		}
 
 		return Result.ok({ name: fruitNameOrError.getValue() });
 	}
 
-	private async _validateRequestStorageData(request: { fruitId: string }): Promise<
-		Result<{ fruitId: StorageFruitId }>
-	> {
-		const storageFruitIdOrError = StorageFruitId.create({ value: request.fruitId });
+	private async _validateRequestStorageData(request: {
+		fruitId: string;
+	}): Promise<Result<{ fruitId: StorageFruitId }>> {
+		const storageFruitIdOrError = StorageFruitId.create({
+			value: request.fruitId,
+		});
 		if (storageFruitIdOrError.isFailure) {
 			return Result.fail(storageFruitIdOrError.getErrorValue().toString());
 		}
@@ -79,22 +91,15 @@ export class FindFruitStorageByName implements UseCase<IFindFruitStorageByNameDT
 
 		if (!storage) {
 			return Result.fail(
-				new FindFruitStorageByNameErrors.StorageDoesNotExistError(request.fruitId).getErrorValue().message,
+				new FindFruitStorageByNameErrors.StorageDoesNotExistError(request.fruitId).getErrorValue()
+					.message,
 			);
 		}
 		return Result.ok({ fruitId: storageFruitIdOrError.getValue() });
 	}
 
 	private async _createFruitStorage(fruit: Fruit, storage: Storage): Promise<Result<FruitStorage>> {
-		const fruitStorageOrError = FruitStorage.create(
-			{ fruit, limit: storage.limit, amount: storage.amount },
-			storage.storageId.getValue(),
-		);
-		if (fruitStorageOrError.isFailure) {
-			return Result.fail(fruitStorageOrError.getErrorValue().toString());
-		}
-
-		return Result.ok<FruitStorage>(fruitStorageOrError.getValue());
+		return FruitStorageFactory.create({ fruit, storage });
 	}
 
 	private async _isFruitExist(name: FruitName): Promise<boolean> {

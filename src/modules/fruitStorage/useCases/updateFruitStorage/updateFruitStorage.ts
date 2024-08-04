@@ -5,10 +5,11 @@ import type { UnitOfWork } from "../../../../shared/infrastructure/unitOfWork/im
 import type { Fruit } from "../../domain/fruit";
 import { FruitDescription } from "../../domain/fruitDescription";
 import { FruitName } from "../../domain/fruitName";
-import { FruitStorage } from "../../domain/fruitStorage";
+import type { FruitStorage } from "../../domain/fruitStorage";
 import type { Storage } from "../../domain/storage";
 import { StorageFruitId } from "../../domain/storageFruitId";
 import { StorageLimit } from "../../domain/storageLimit";
+import { FruitStorageFactory } from "../../factory/fruitStorageFactory";
 import type { FruitRepository } from "../../repositories/implementations/fruitRepository";
 import type { StorageRepository } from "../../repositories/implementations/storageRepository";
 import type { IUpdateFruitStorageDTO } from "./updateFruitStorageDTO";
@@ -16,12 +17,18 @@ import { UpdateFruitStorageErrors } from "./updateFruitStorageErrors";
 import { UpdateFruitStorageOutbox } from "./updateFruitStorageOutbox";
 import type { UpdateFruitStorageResponse } from "./updateFruitStorageResponse";
 
-export class UpdateFruitStorage implements UseCase<IUpdateFruitStorageDTO, UpdateFruitStorageResponse> {
+export class UpdateFruitStorage
+	implements UseCase<IUpdateFruitStorageDTO, UpdateFruitStorageResponse>
+{
 	private _fruitRepository: FruitRepository;
 	private _storageRepository: StorageRepository;
 	private _unitOfWork: UnitOfWork;
 
-	constructor(fruitRepository: FruitRepository, storageRepository: StorageRepository, unitOfWork: UnitOfWork) {
+	constructor(
+		fruitRepository: FruitRepository,
+		storageRepository: StorageRepository,
+		unitOfWork: UnitOfWork,
+	) {
 		this._fruitRepository = fruitRepository;
 		this._storageRepository = storageRepository;
 		this._unitOfWork = unitOfWork;
@@ -57,7 +64,7 @@ export class UpdateFruitStorage implements UseCase<IUpdateFruitStorageDTO, Updat
 				validateRequestStorageData.getValue().limit,
 			);
 
-			const fruitStorageOrError = await this._createFruitStorage(fruit, storage);
+			const fruitStorageOrError = this._createFruitStorage(fruit, storage);
 			if (fruitStorageOrError.isFailure) {
 				return left(fruitStorageOrError);
 			}
@@ -75,14 +82,19 @@ export class UpdateFruitStorage implements UseCase<IUpdateFruitStorageDTO, Updat
 		}
 	}
 
-	private async _validateRequestFruitData(request: { name: string; description: string }): Promise<
+	private async _validateRequestFruitData(request: {
+		name: string;
+		description: string;
+	}): Promise<
 		Result<{
 			name: FruitName;
 			description: FruitDescription;
 		}>
 	> {
 		const fruitNameOrError = FruitName.create({ value: request.name });
-		const fruitDescriptionOrError = FruitDescription.create({ value: request.description });
+		const fruitDescriptionOrError = FruitDescription.create({
+			value: request.description,
+		});
 
 		const fruitCombineResult = Result.combine([fruitNameOrError, fruitDescriptionOrError]);
 		if (fruitCombineResult.isFailure) {
@@ -92,7 +104,9 @@ export class UpdateFruitStorage implements UseCase<IUpdateFruitStorageDTO, Updat
 		const fruitExist = await this._isFruitExist(fruitNameOrError.getValue());
 		if (!fruitExist) {
 			return Result.fail(
-				new UpdateFruitStorageErrors.FruitDoesNotExistError(fruitNameOrError.getValue().value).getErrorValue().message,
+				new UpdateFruitStorageErrors.FruitDoesNotExistError(
+					fruitNameOrError.getValue().value,
+				).getErrorValue().message,
 			);
 		}
 
@@ -111,8 +125,12 @@ export class UpdateFruitStorage implements UseCase<IUpdateFruitStorageDTO, Updat
 			limit: StorageLimit;
 		}>
 	> {
-		const storageFruitIdOrError = StorageFruitId.create({ value: request.fruitId });
-		const storageLimitOrError = StorageLimit.create({ value: request.limitOfFruitToBeStored });
+		const storageFruitIdOrError = StorageFruitId.create({
+			value: request.fruitId,
+		});
+		const storageLimitOrError = StorageLimit.create({
+			value: request.limitOfFruitToBeStored,
+		});
 
 		const storageCombineResult = Result.combine([storageFruitIdOrError, storageLimitOrError]);
 		if (storageCombineResult.isFailure) {
@@ -120,14 +138,17 @@ export class UpdateFruitStorage implements UseCase<IUpdateFruitStorageDTO, Updat
 		}
 
 		if (this._validateStorageAmount(storageLimitOrError.getValue().value)) {
-			return Result.fail(new UpdateFruitStorageErrors.LimitHasToBePositiveNumber().getErrorValue().message);
+			return Result.fail(
+				new UpdateFruitStorageErrors.LimitHasToBePositiveNumber().getErrorValue().message,
+			);
 		}
 
 		const storageExist = await this._isStorageExist(storageFruitIdOrError.getValue());
 		if (!storageExist) {
 			return Result.fail(
-				new UpdateFruitStorageErrors.StorageDoesNotExistError(storageFruitIdOrError.getValue().value).getErrorValue()
-					.message,
+				new UpdateFruitStorageErrors.StorageDoesNotExistError(
+					storageFruitIdOrError.getValue().value,
+				).getErrorValue().message,
 			);
 		}
 
@@ -137,16 +158,8 @@ export class UpdateFruitStorage implements UseCase<IUpdateFruitStorageDTO, Updat
 		});
 	}
 
-	private async _createFruitStorage(fruit: Fruit, storage: Storage): Promise<Result<FruitStorage>> {
-		const fruitStorageOrError = FruitStorage.create(
-			{ fruit, limit: storage.limit, amount: storage.amount },
-			storage.storageId.getValue(),
-		);
-		if (fruitStorageOrError.isFailure) {
-			return Result.fail(fruitStorageOrError.getErrorValue().toString());
-		}
-
-		return Result.ok<FruitStorage>(fruitStorageOrError.getValue());
+	private _createFruitStorage(fruit: Fruit, storage: Storage): Result<FruitStorage> {
+		return FruitStorageFactory.create({ fruit, storage });
 	}
 
 	private async _isFruitExist(name: FruitName): Promise<boolean> {
@@ -170,6 +183,6 @@ export class UpdateFruitStorage implements UseCase<IUpdateFruitStorageDTO, Updat
 	}
 
 	private async _emitOutboxEvent(fruitStorage: FruitStorage): Promise<void> {
-		UpdateFruitStorageOutbox.emit(fruitStorage);
+		await UpdateFruitStorageOutbox.emit(fruitStorage);
 	}
 }

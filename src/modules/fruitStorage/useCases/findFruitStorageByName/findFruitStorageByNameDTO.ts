@@ -1,3 +1,3 @@
 export interface IFindFruitStorageByNameDTO {
-  name: string;
+	name: string;
 }
