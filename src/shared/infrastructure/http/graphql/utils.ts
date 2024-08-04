@@ -1,15 +1,14 @@
-import type { Fruit } from "../../../../modules/fruit/domain/fruit";
-import type { Storage } from "../../../../modules/storage/domain/storage";
+import type { FruitStorage } from "../../../../modules/fruitStorage/domain/fruitStorage";
 
-export const parseReturn = (storage: Storage, fruit: Fruit) => {
+export const parseReturn = (fruitStorage: FruitStorage) => {
 	return {
-		id: storage.storageId.getStringValue(),
-		limit: storage.limit.value,
-		amount: storage.amount.value,
+		id: fruitStorage.storageId.getStringValue(),
+		limit: fruitStorage.limit.value,
+		amount: fruitStorage.amount.value,
 		fruit: {
-			id: fruit.fruitId.getStringValue(),
-			name: fruit.name.value,
-			description: fruit.description.value,
+			id: fruitStorage.fruit.fruitId.getStringValue(),
+			name: fruitStorage.fruit.name.value,
+			description: fruitStorage.fruit.description.value,
 		},
 	};
 };
