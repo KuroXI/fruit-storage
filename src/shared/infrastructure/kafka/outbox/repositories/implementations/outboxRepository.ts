@@ -20,7 +20,7 @@ export class OutboxRepository implements IOutboxRepository {
 		return pendings.map((pending) => OutboxMapper.toDomain(pending));
 	}
 
-	async markAsProcessed(outbox: OutboxPayload): Promise<void> {
-		await this._model.findOneAndUpdate({ id: outbox.id }, { processed: true });
+	async markAsProcessed(id: string | number): Promise<void> {
+		await this._model.findOneAndUpdate({ _id: id }, { processed: true });
 	}
 }

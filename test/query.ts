@@ -12,13 +12,8 @@ export const createFruitForFruitStorageQuery = gql`
       limitOfFruitToBeStored: $limitOfFruitToBeStored
     ) {
       id
-      amount
-      limit
-      fruit {
-        description
-        id
-        name
-      }
+      name
+      description
     }
   }
 `;

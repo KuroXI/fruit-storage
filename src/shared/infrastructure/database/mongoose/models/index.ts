@@ -1,15 +1,15 @@
 import { FruitModel } from "./Fruit";
-import { FruitStorageModel } from "./FruitStorage";
 import { OutboxModel } from "./Outbox";
+import { StorageModel } from "./Storage";
 
 export type MongooseModels = {
 	fruit: typeof FruitModel;
-	fruitStorage: typeof FruitStorageModel;
+	storage: typeof StorageModel;
 	outbox: typeof OutboxModel;
 };
 
 export const models: MongooseModels = {
 	fruit: FruitModel,
-	fruitStorage: FruitStorageModel,
+	storage: StorageModel,
 	outbox: OutboxModel,
 };

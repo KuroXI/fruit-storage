@@ -1,10 +1,5 @@
-import type { Fruit } from "../../../../../modules/fruit/domain/fruit";
-import { getFruit } from "../../../../../modules/fruit/useCases/getFruit";
-import type { GetFruitResponse } from "../../../../../modules/fruit/useCases/getFruit/getFruitResponse";
-import type { Storage } from "../../../../../modules/storage/domain/storage";
-import { removeStorage } from "../../../../../modules/storage/useCases/removeStorage";
-import type { RemoveStorageResponse } from "../../../../../modules/storage/useCases/removeStorage/removeStorageResponse";
-import { parseReturn } from "../utils";
+import { getFruitByNameController } from "../../../../../modules/fruit/useCases/getFruitByName";
+import { removeAmountFromStorageController } from "../../../../../modules/storage/useCases/removeAmountFromStorage";
 
 type RemoveFruitFromFruitStorageProps = {
 	name: string;
@@ -15,24 +10,22 @@ export const removeFruitFromFruitStorageResolver = async (
 	props: RemoveFruitFromFruitStorageProps,
 ) => {
 	try {
-		const fruit = await getFruit.execute({ name: props.name });
-		if (fruit.isLeft()) {
-			throw new Error(fruit.value.getErrorValue());
-		}
-
-		const fruitValue = (fruit as GetFruitResponse).value.getValue() as Fruit;
-
-		const storage = await removeStorage.execute({
-			fruidId: fruitValue.fruitId.getStringValue(),
+		const fruit = await getFruitByNameController.executeImpl(props);
+		const storage = await removeAmountFromStorageController.executeImpl({
+			fruidId: fruit.fruitId.getStringValue(),
 			amount: props.amount,
 		});
-		if (storage.isLeft()) {
-			throw new Error(storage.value.getErrorValue());
-		}
 
-		const storageValue = (storage as RemoveStorageResponse).value.getValue() as Storage;
-
-		return parseReturn(storageValue, fruitValue);
+		return {
+			id: storage.storageId.getStringValue(),
+			limit: storage.limit.value,
+			amount: storage.amount.value,
+			fruit: {
+				id: fruit.fruitId.getStringValue(),
+				name: fruit.name.value,
+				description: fruit.description.value,
+			},
+		};
 	} catch (error) {
 		return error;
 	}

@@ -3,5 +3,5 @@ import type { OutboxPayload } from "../outboxPayload";
 export interface IOutboxRepository {
 	sendPayload(outbox: OutboxPayload): Promise<void>;
 	getPendings(): Promise<OutboxPayload[]>;
-	markAsProcessed(outbox: OutboxPayload): Promise<void>;
+	markAsProcessed(id: string | number): Promise<void>;
 }

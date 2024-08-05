@@ -2,23 +2,22 @@ import { OutboxPayload } from "../../../../shared/infrastructure/kafka/outbox/ou
 import { outboxRepository } from "../../../../shared/infrastructure/kafka/outbox/repositories";
 import { FruitCreated } from "../../domain/events/fruitCreated";
 import type { Fruit } from "../../domain/fruit";
-import { FruitMapper } from "../../mappers/fruitMapper";
 
 export class CreateFruitOutbox {
-	public static emit(fruit: Fruit) {
+	public static async emit(fruit: Fruit, limit: number) {
 		const event = new FruitCreated(fruit);
 
-		const outboxPayloadOrError = OutboxPayload.create(
-			{
-				eventName: event.getEventName(),
-				payload: JSON.stringify(FruitMapper.toPersistence(event.getPayload())),
-				processed: false,
-				createdAt: event.getDateTimeOccurred(),
-			},
-			event.getAggregateId(),
-		);
+		const outboxPayloadOrError = OutboxPayload.create({
+			eventName: event.getEventName(),
+			payload: JSON.stringify({
+				...event.getPayloadToJSON(),
+				limit,
+			}),
+			processed: false,
+			createdAt: event.getDateTimeOccurred(),
+		});
 		if (outboxPayloadOrError.isFailure) throw new Error();
 
-		outboxRepository.sendPayload(outboxPayloadOrError.getValue());
+		await outboxRepository.sendPayload(outboxPayloadOrError.getValue());
 	}
 }

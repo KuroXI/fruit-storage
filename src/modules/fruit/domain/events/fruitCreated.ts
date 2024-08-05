@@ -1,5 +1,5 @@
-import type { IDomainEvent } from "../../../../shared/domain/events/IDomainEvents";
 import type { UniqueEntityID } from "../../../../shared/domain/UniqueEntityID";
+import type { IDomainEvent } from "../../../../shared/domain/events/IDomainEvents";
 import type { Fruit } from "../fruit";
 
 export const FRUIT_CREATE_EVENT_NAME = "FRUIT_CREATE";
@@ -29,5 +29,13 @@ export class FruitCreated implements IDomainEvent<Fruit> {
 
 	getPayload(): Fruit {
 		return this._payload;
+	}
+
+	getPayloadToJSON(): object {
+		return {
+			id: this._payload.fruitId.getStringValue(),
+			name: this._payload.name.value,
+			description: this._payload.description.value,
+		};
 	}
 }

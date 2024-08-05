@@ -5,4 +5,5 @@ export interface IDomainEvent<T> {
 	getAggregateId(): UniqueEntityID;
 	getDateTimeOccurred(): Date;
 	getPayload(): T;
+	getPayloadToJSON(): object;
 }

@@ -1,32 +1,27 @@
-import type { Fruit } from "../../../../../modules/fruit/domain/fruit";
-import { getFruit } from "../../../../../modules/fruit/useCases/getFruit";
-import type { GetFruitResponse } from "../../../../../modules/fruit/useCases/getFruit/getFruitResponse";
-import type { Storage } from "../../../../../modules/storage/domain/storage";
-import { getStorage } from "../../../../../modules/storage/useCases/getStorage";
-import type { GetStorageResponse } from "../../../../../modules/storage/useCases/getStorage/getStorageResponse";
-import { parseReturn } from "../utils";
+import { getFruitByNameController } from "../../../../../modules/fruit/useCases/getFruitByName";
+import { getStorageByFruitIdController } from "../../../../../modules/storage/useCases/getStorageByFruitId";
 
 interface IFindFruitResolverProps {
 	name: string;
 }
 
-export const findFruitResolver = async ({ name }: IFindFruitResolverProps) => {
+export const findFruitResolver = async (props: IFindFruitResolverProps) => {
 	try {
-		const fruit = await getFruit.execute({ name });
-		if (fruit.isLeft()) {
-			throw new Error(fruit.value.getErrorValue());
-		}
+		const fruit = await getFruitByNameController.executeImpl(props);
+		const storage = await getStorageByFruitIdController.executeImpl({
+			fruitId: fruit.fruitId.getStringValue(),
+		});
 
-		const fruitValue = (fruit as GetFruitResponse).value.getValue() as Fruit;
-
-		const storage = await getStorage.execute({ fruitId: fruitValue.fruitId.getStringValue() });
-		if (storage.isLeft()) {
-			throw new Error(storage.value.getErrorValue());
-		}
-
-		const storageValue = (storage as GetStorageResponse).value.getValue() as Storage;
-
-		return parseReturn(storageValue, fruitValue);
+		return {
+			id: storage.storageId.getStringValue(),
+			limit: storage.limit.value,
+			amount: storage.amount.value,
+			fruit: {
+				id: fruit.fruitId.getStringValue(),
+				name: fruit.name.value,
+				description: fruit.description.value,
+			},
+		};
 	} catch (error) {
 		return error;
 	}

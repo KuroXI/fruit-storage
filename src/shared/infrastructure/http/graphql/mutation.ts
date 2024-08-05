@@ -27,14 +27,13 @@ export const mutation = mutationType({
 				removeFruitFromFruitStorageResolver(args) as NexusGenRootTypes["ReturnQuery"],
 		});
 		type.nonNull.field("createFruitForFruitStorage", {
-			type: "ReturnQuery",
+			type: "Fruit",
 			args: {
 				name: nonNull(stringArg()),
 				description: nonNull(stringArg()),
 				limitOfFruitToBeStored: nonNull(intArg()),
 			},
-			resolve: (_, args) =>
-				createFruitForFruitStorageResolver(args) as NexusGenRootTypes["ReturnQuery"],
+			resolve: (_, args) => createFruitForFruitStorageResolver(args) as NexusGenRootTypes["Fruit"],
 		});
 		type.nonNull.field("updateFruitForFruitStorage", {
 			type: "ReturnQuery",

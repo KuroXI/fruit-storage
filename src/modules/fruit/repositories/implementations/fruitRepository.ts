@@ -18,7 +18,7 @@ export class FruitRepository implements IFruitRepository {
 		return !!fruit;
 	}
 
-	async save(fruit: Fruit): Promise<void> {
+	async saveFruit(fruit: Fruit): Promise<void> {
 		const exists = await this.exists(fruit.name);
 
 		if (exists) {
@@ -29,13 +29,13 @@ export class FruitRepository implements IFruitRepository {
 		await this._models.create(rawMongooseFruit);
 	}
 
-	async delete(name: FruitName): Promise<Fruit> {
+	async deleteFruitByName(name: FruitName): Promise<Fruit> {
 		const fruit = await this._models.findOneAndDelete({ name: name.value }).lean();
 
 		return FruitMapper.toDomain(fruit);
 	}
 
-	async update(name: FruitName, description: FruitDescription): Promise<Fruit> {
+	async updateFruit(name: FruitName, description: FruitDescription): Promise<Fruit> {
 		const fruit = await this._models
 			.findOneAndUpdate({ name: name.value }, { description: description.value }, { new: true })
 			.lean();
@@ -43,7 +43,7 @@ export class FruitRepository implements IFruitRepository {
 		return FruitMapper.toDomain(fruit);
 	}
 
-	async getFruit(name: FruitName): Promise<Fruit> {
+	async getFruitByName(name: FruitName): Promise<Fruit> {
 		const fruit = await this._models.findOne({ name: name.value }).lean();
 
 		return FruitMapper.toDomain(fruit);

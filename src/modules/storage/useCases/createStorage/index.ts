@@ -1,7 +1,8 @@
-import { unitOfWork } from "../../../../shared/infrastructure/unitOfWork";
 import { storageRepository } from "../../repositories";
 import { CreateStorage } from "./createStorage";
+import { CreateStorageController } from "./createStorageController";
 
-const createStorage = new CreateStorage(storageRepository, unitOfWork);
+const createStorageUseCase = new CreateStorage(storageRepository);
+const createStorageController = new CreateStorageController(createStorageUseCase);
 
-export { createStorage };
+export { createStorageUseCase, createStorageController };

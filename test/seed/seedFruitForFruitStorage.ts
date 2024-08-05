@@ -1,6 +1,6 @@
 import { UniqueEntityID } from "../../src/shared/domain/UniqueEntityID";
 import { FruitModel } from "../../src/shared/infrastructure/database/mongoose/models/Fruit";
-import { FruitStorageModel } from "../../src/shared/infrastructure/database/mongoose/models/FruitStorage";
+import { StorageModel } from "../../src/shared/infrastructure/database/mongoose/models/Storage";
 
 type SeedFruitForFruitStorageProps = {
 	name: string;
@@ -11,15 +11,15 @@ type SeedFruitForFruitStorageProps = {
 
 export const seedFruitForFruitStorage = async (props: SeedFruitForFruitStorageProps) => {
 	const fruit = await FruitModel.create({
-		id: new UniqueEntityID(),
+		_id: new UniqueEntityID(),
 		name: props.name,
 		description: props.description,
 	});
 	await fruit.save();
 
-	const storage = await FruitStorageModel.create({
-		id: new UniqueEntityID(),
-		fruitId: fruit.id,
+	const storage = await StorageModel.create({
+		_id: new UniqueEntityID(),
+		fruitId: fruit._id,
 		limit: props.limit,
 		amount: props.amount,
 	});

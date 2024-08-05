@@ -1,4 +1,4 @@
-export interface StorageDTO {
+export interface IStorageDTO {
 	id: string;
 	fruitId: string;
 	limit: number;

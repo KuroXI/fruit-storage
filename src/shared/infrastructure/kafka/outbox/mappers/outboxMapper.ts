@@ -11,7 +11,7 @@ export class OutboxMapper {
 				processed: raw.processed,
 				createdAt: raw.createdAt,
 			},
-			new UniqueEntityID(raw.id),
+			new UniqueEntityID(raw._id),
 		);
 
 		if (outboxOrError.isFailure) {
@@ -23,7 +23,7 @@ export class OutboxMapper {
 
 	public static toPersistence(outbox: OutboxPayload) {
 		return {
-			id: outbox.id,
+			_id: outbox.id,
 			eventName: outbox.eventName,
 			payload: outbox.payload,
 			processed: outbox.processed,

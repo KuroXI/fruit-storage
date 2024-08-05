@@ -1,4 +1,4 @@
-export interface UpdateFruitDTO {
+export interface IUpdateFruitDTO {
 	name: string;
 	description: string;
 }

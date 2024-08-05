@@ -5,6 +5,9 @@ const kafka = new Kafka(kafkaConfig.clientConfig);
 
 const consumer = kafka.consumer({ groupId: "fruit-consumer" });
 
-const producer = kafka.producer({ createPartitioner: Partitioners.DefaultPartitioner });
+const producer = kafka.producer({
+	createPartitioner: Partitioners.DefaultPartitioner,
+	transactionalId: "fruit-producer",
+});
 
 export { consumer, producer };

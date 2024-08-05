@@ -1,5 +1,3 @@
-import "jest";
-
 import { ApolloServer } from "@apollo/server";
 import schema from "../../src/shared/infrastructure/http/graphql/schema";
 import { createFruitForFruitStorageQuery } from "../query";
@@ -30,9 +28,8 @@ describe("Fruit Creation Tests", () => {
 
 		expect(errors).toBeFalsy();
 		expect(data.createFruitForFruitStorage).toBeTruthy();
-		expect(data.createFruitForFruitStorage.fruit.name).toBe("lemon");
-		expect(data.createFruitForFruitStorage.fruit.description).toBe("this is a lemon");
-		expect(data.createFruitForFruitStorage.limit).toBe(10);
+		expect(data.createFruitForFruitStorage.name).toBe("lemon");
+		expect(data.createFruitForFruitStorage.description).toBe("this is a lemon");
 	});
 
 	it("should return an error due to a long description", async () => {

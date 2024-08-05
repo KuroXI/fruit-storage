@@ -13,7 +13,7 @@ export class StorageMapper {
 				limit: StorageLimit.create({ value: raw.limit }).getValue(),
 				amount: StorageAmount.create({ value: raw.amount }).getValue(),
 			},
-			new UniqueEntityID(raw.id),
+			new UniqueEntityID(raw._id),
 		);
 
 		if (storageOrError.isFailure) {
@@ -25,7 +25,7 @@ export class StorageMapper {
 
 	public static toPersistence(storage: Storage) {
 		return {
-			id: storage.storageId.getValue(),
+			_id: storage.storageId.getValue(),
 			fruitId: storage.fruitId.value,
 			limit: storage.limit.value,
 			amount: storage.amount.value,

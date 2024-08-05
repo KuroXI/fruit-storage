@@ -9,7 +9,7 @@ type Fruit {
 }
 
 type Mutation {
-  createFruitForFruitStorage(description: String!, limitOfFruitToBeStored: Int!, name: String!): ReturnQuery!
+  createFruitForFruitStorage(description: String!, limitOfFruitToBeStored: Int!, name: String!): Fruit!
   deleteFruitFromFruitStorage(forceDelete: Boolean! = false, name: String!): ReturnQuery!
   removeFruitFromFruitStorage(amount: Int!, name: String!): ReturnQuery!
   storeFruitToFruitStorage(amount: Int!, name: String!): ReturnQuery!

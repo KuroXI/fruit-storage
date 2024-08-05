@@ -1,4 +1,4 @@
-export interface CreateStorageDTO {
+export interface ICreateStorageDTO {
 	fruitId: string;
 	limitOfFruitToBeStored: number;
 }

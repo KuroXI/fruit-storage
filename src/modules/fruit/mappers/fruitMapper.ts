@@ -13,7 +13,7 @@ export class FruitMapper {
 					value: raw.description,
 				}).getValue(),
 			},
-			new UniqueEntityID(raw.id),
+			new UniqueEntityID(raw._id),
 		);
 
 		if (fruitOrError.isFailure) {
@@ -25,7 +25,7 @@ export class FruitMapper {
 
 	public static toPersistence(fruit: Fruit) {
 		return {
-			id: fruit.fruitId.getValue(),
+			_id: fruit.id,
 			name: fruit.name.value,
 			description: fruit.description.value,
 		};

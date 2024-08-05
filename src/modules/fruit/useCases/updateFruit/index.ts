@@ -1,7 +1,9 @@
 import { unitOfWork } from "../../../../shared/infrastructure/unitOfWork";
 import { fruitRepository } from "../../repositories";
 import { UpdateFruit } from "./updateFruit";
+import { UpdateFruitController } from "./updateFruitController";
 
-const updateFruit = new UpdateFruit(fruitRepository, unitOfWork);
+const updateFruitUseCase = new UpdateFruit(fruitRepository, unitOfWork);
+const updatedFruitController = new UpdateFruitController(updateFruitUseCase);
 
-export { updateFruit };
+export { updateFruitUseCase, updatedFruitController };

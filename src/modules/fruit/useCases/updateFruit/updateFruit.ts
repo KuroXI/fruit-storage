@@ -6,12 +6,11 @@ import type { Fruit } from "../../domain/fruit";
 import { FruitDescription } from "../../domain/fruitDescription";
 import { FruitName } from "../../domain/fruitName";
 import type { IFruitRepository } from "../../repositories/IFruitRepository";
-import type { UpdateFruitDTO } from "./updateFruitDTO";
+import type { IUpdateFruitDTO } from "./updateFruitDTO";
 import { UpdateFruitErrors } from "./updateFruitErrors";
-import { UpdateFruitOutbox } from "./updateFruitOutbox";
 import type { UpdateFruitResponse } from "./updateFruitResponse";
 
-export class UpdateFruit implements UseCase<UpdateFruitDTO, UpdateFruitResponse> {
+export class UpdateFruit implements UseCase<IUpdateFruitDTO, UpdateFruitResponse> {
 	private _fruitRepository: IFruitRepository;
 	private _unitOfWork: UnitOfWork;
 
@@ -20,43 +19,65 @@ export class UpdateFruit implements UseCase<UpdateFruitDTO, UpdateFruitResponse>
 		this._unitOfWork = unitOfWork;
 	}
 
-	public async execute(request: UpdateFruitDTO): Promise<UpdateFruitResponse> {
+	public async execute(request: IUpdateFruitDTO): Promise<UpdateFruitResponse> {
 		try {
-			await this._unitOfWork.start();
+			await this._unitOfWork.startTransaction();
 
-			const fruitNameOrError = FruitName.create({ value: request.name });
-			const fruitDescriptionOrError = FruitDescription.create({ value: request.description });
-
-			const fruitCombineResult = Result.combine([fruitNameOrError, fruitDescriptionOrError]);
-			if (fruitCombineResult.isFailure) {
-				return left(Result.fail<UpdateFruit>(fruitCombineResult.getErrorValue()));
+			const validateRequest = await this._validateRequest(request);
+			if (validateRequest.isFailure) {
+				return left(validateRequest);
 			}
 
-			const fruitAlreadyExists = await this._fruitRepository.exists(fruitNameOrError.getValue());
-			if (!fruitAlreadyExists) {
-				return left(
-					Result.fail(
-						new UpdateFruitErrors.FruitDoesNotExistError(
-							fruitNameOrError.getValue().value,
-						).getErrorValue().message,
-					),
-				);
-			}
+			const updatedFruit = await this._updateFruit(validateRequest.getValue());
 
-			const updatedFruit = await this._fruitRepository.update(
-				fruitNameOrError.getValue(),
-				fruitDescriptionOrError.getValue(),
-			);
+			await this._unitOfWork.commitTransaction();
 
-			UpdateFruitOutbox.emit(updatedFruit);
-
-			await this._unitOfWork.commit();
 			return right(Result.ok<Fruit>(updatedFruit));
 		} catch (error) {
-			await this._unitOfWork.abort();
+			await this._unitOfWork.abortTransaction();
 			return left(new AppError.UnexpectedError(error));
 		} finally {
-			await this._unitOfWork.end();
+			await this._unitOfWork.endTransaction();
 		}
+	}
+
+	private async _validateRequest(request: IUpdateFruitDTO): Promise<
+		Result<{
+			name: FruitName;
+			description: FruitDescription;
+		}>
+	> {
+		const fruitNameOrError = FruitName.create({ value: request.name });
+		const fruitDescriptionOrError = FruitDescription.create({ value: request.description });
+
+		const fruitCombineResult = Result.combine([fruitNameOrError, fruitDescriptionOrError]);
+		if (fruitCombineResult.isFailure) {
+			return Result.fail(fruitCombineResult.getErrorValue());
+		}
+
+		const fruitAlreadyExists = await this._isFruitExist(fruitNameOrError.getValue());
+		if (!fruitAlreadyExists) {
+			return Result.fail(
+				new UpdateFruitErrors.FruitDoesNotExistError(
+					fruitNameOrError.getValue().props.value,
+				).getErrorValue().message,
+			);
+		}
+
+		return Result.ok({
+			name: fruitNameOrError.getValue(),
+			description: fruitDescriptionOrError.getValue(),
+		});
+	}
+
+	private async _isFruitExist(name: FruitName): Promise<boolean> {
+		return await this._fruitRepository.exists(name);
+	}
+
+	private async _updateFruit(props: {
+		name: FruitName;
+		description: FruitDescription;
+	}): Promise<Fruit> {
+		return await this._fruitRepository.updateFruit(props.name, props.description);
 	}
 }

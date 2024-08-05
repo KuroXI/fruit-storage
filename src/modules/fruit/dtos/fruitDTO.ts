@@ -1,4 +1,4 @@
-export interface FruitDTO {
+export interface IFruitDTO {
 	id: string;
 	name: string;
 	description: string;

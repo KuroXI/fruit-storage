@@ -4,8 +4,8 @@ import type { FruitName } from "../domain/fruitName";
 
 export interface IFruitRepository {
 	exists(name: FruitName): Promise<boolean>;
-	save(fruit: Fruit): Promise<void>;
-	delete(name: FruitName): Promise<Fruit>;
-	update(name: FruitName, description: FruitDescription): Promise<Fruit>;
-	getFruit(name: FruitName): Promise<Fruit>;
+	saveFruit(fruit: Fruit): Promise<void>;
+	deleteFruitByName(name: FruitName): Promise<Fruit>;
+	updateFruit(name: FruitName, description: FruitDescription): Promise<Fruit>;
+	getFruitByName(name: FruitName): Promise<Fruit>;
 }

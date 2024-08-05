@@ -60,7 +60,7 @@ export interface NexusGenFieldTypes {
     name: string | null; // String
   }
   Mutation: { // field return type
-    createFruitForFruitStorage: NexusGenRootTypes['ReturnQuery']; // ReturnQuery!
+    createFruitForFruitStorage: NexusGenRootTypes['Fruit']; // Fruit!
     deleteFruitFromFruitStorage: NexusGenRootTypes['ReturnQuery']; // ReturnQuery!
     removeFruitFromFruitStorage: NexusGenRootTypes['ReturnQuery']; // ReturnQuery!
     storeFruitToFruitStorage: NexusGenRootTypes['ReturnQuery']; // ReturnQuery!
@@ -84,7 +84,7 @@ export interface NexusGenFieldTypeNames {
     name: 'String'
   }
   Mutation: { // field return type name
-    createFruitForFruitStorage: 'ReturnQuery'
+    createFruitForFruitStorage: 'Fruit'
     deleteFruitFromFruitStorage: 'ReturnQuery'
     removeFruitFromFruitStorage: 'ReturnQuery'
     storeFruitToFruitStorage: 'ReturnQuery'

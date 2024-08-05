@@ -1,5 +1,5 @@
 import type { Producer } from "kafkajs";
-import { outboxProducer } from "../producer";
+import { outboxProducer } from "../../../../../../modules/fruit/producer";
 import type { IOutboxJobs } from "./IOutboxJobs";
 
 export class OutboxJobs implements IOutboxJobs {

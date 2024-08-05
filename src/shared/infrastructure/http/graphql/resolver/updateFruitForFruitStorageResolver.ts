@@ -1,10 +1,5 @@
-import type { Fruit } from "../../../../../modules/fruit/domain/fruit";
-import { updateFruit } from "../../../../../modules/fruit/useCases/updateFruit";
-import type { UpdateFruitResponse } from "../../../../../modules/fruit/useCases/updateFruit/updateFruitResponse";
-import type { Storage } from "../../../../../modules/storage/domain/storage";
-import { updateStorage } from "../../../../../modules/storage/useCases/updateStorage";
-import type { UpdateStorageResponse } from "../../../../../modules/storage/useCases/updateStorage/updateStorageResponse";
-import { parseReturn } from "../utils";
+import { updatedFruitController } from "../../../../../modules/fruit/useCases/updateFruit";
+import { updateStorageByFruitIdController } from "../../../../../modules/storage/useCases/updateStorageByFruitId";
 
 type UpdateFruitForFruitStorageProps = {
 	name: string;
@@ -16,24 +11,22 @@ export const updateFruitForFruitStorageResolver = async (
 	props: UpdateFruitForFruitStorageProps,
 ) => {
 	try {
-		const fruit = await updateFruit.execute({ name: props.name, description: props.description });
-		if (fruit.isLeft()) {
-			throw new Error(fruit.value.getErrorValue());
-		}
-
-		const fruitValue = (fruit as UpdateFruitResponse).value.getValue() as Fruit;
-
-		const storage = await updateStorage.execute({
-			fruidId: fruitValue.fruitId.getStringValue(),
+		const fruit = await updatedFruitController.executeImpl(props);
+		const storage = await updateStorageByFruitIdController.executeImpl({
+			fruidId: fruit.fruitId.getStringValue(),
 			limit: props.limitOfFruitToBeStored,
 		});
-		if (storage.isLeft()) {
-			throw new Error(storage.value.getErrorValue());
-		}
 
-		const storageValue = (storage as UpdateStorageResponse).value.getValue() as Storage;
-
-		return parseReturn(storageValue, fruitValue);
+		return {
+			id: storage.storageId.getStringValue(),
+			limit: storage.limit.value,
+			amount: storage.amount.value,
+			fruit: {
+				id: fruit.fruitId.getStringValue(),
+				name: fruit.name.value,
+				description: fruit.description.value,
+			},
+		};
 	} catch (error) {
 		return error;
 	}
