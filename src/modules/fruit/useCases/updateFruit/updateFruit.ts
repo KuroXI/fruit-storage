@@ -25,6 +25,7 @@ export class UpdateFruit implements UseCase<IUpdateFruitDTO, UpdateFruitResponse
 
 			const validateRequest = await this._validateRequest(request);
 			if (validateRequest.isFailure) {
+				await this._unitOfWork.abortTransaction();
 				return left(validateRequest);
 			}
 

@@ -9,6 +9,7 @@ const fruit = objectType({
 		type.id("id");
 		type.string("name");
 		type.string("description");
+		type.int("amount");
 	},
 });
 
@@ -17,7 +18,6 @@ export const returnQuery = objectType({
 	definition: (type) => {
 		type.id("id");
 		type.int("limit");
-		type.int("amount");
 		type.field("fruit", { type: fruit });
 	},
 });

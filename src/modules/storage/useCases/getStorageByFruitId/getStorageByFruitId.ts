@@ -52,6 +52,6 @@ export class GetStorageByFruitId
 	}
 
 	private async _getStorageByFruitId(fruitId: StorageFruitId): Promise<Storage> {
-		return await this._storageRepository.getStorageByFruitId(fruitId);
+		return await this._storageRepository.getStorageByFruitId(fruitId.value);
 	}
 }

@@ -14,6 +14,7 @@ export const createFruitForFruitStorageQuery = gql`
       id
       name
       description
+      amount
     }
   }
 `;
@@ -30,12 +31,12 @@ export const updateFruitForFruitStorageQuery = gql`
       limitOfFruitToBeStored: $limitOfFruitToBeStored
     ) {
       id
-      amount
       limit
       fruit {
         description
         id
         name
+        amount
       }
     }
   }
@@ -45,12 +46,12 @@ export const deleteFruitFromFruitStorageQuery = gql`
   mutation DeleteFruitFromFruitStorage($name: String!, $forceDelete: Boolean!) {
     deleteFruitFromFruitStorage(name: $name, forceDelete: $forceDelete) {
       id
-      amount
       limit
       fruit {
         description
         id
         name
+        amount
       }
     }
   }
@@ -60,12 +61,12 @@ export const storeFruitToFruitStorageQuery = gql`
   mutation StoreFruitToFruitStorage($name: String!, $amount: Int!) {
     storeFruitToFruitStorage(name: $name, amount: $amount) {
       id
-      amount
       limit
       fruit {
         description
         id
         name
+        amount
       }
     }
 }
@@ -75,12 +76,12 @@ export const removeFruitFromFruitStorageQuery = gql`
   mutation RemoveFruitFromFruitStorage($name: String!, $amount: Int!) {
     removeFruitFromFruitStorage(name: $name, amount: $amount) {
       id
-      amount
       limit
       fruit {
         description
         id
         name
+        amount
       }
     }
   }
@@ -90,12 +91,12 @@ export const findFruitQuery = gql`
   query FindFruit($name: String!) {
     findFruit(name: $name) {
       id
-      amount
       limit
       fruit {
         description
         id
         name
+        amount
       }
     }
   }

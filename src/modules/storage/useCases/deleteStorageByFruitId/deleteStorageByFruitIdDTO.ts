@@ -1,4 +1,3 @@
 export interface IDeleteStorageByFruitIdDTO {
-	fruidId: string;
-	forceDelete: boolean;
+	fruitId: string;
 }

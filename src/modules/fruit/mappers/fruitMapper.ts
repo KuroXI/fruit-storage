@@ -1,5 +1,6 @@
 import { UniqueEntityID } from "../../../shared/domain/UniqueEntityID";
 import { Fruit } from "../domain/fruit";
+import { FruitAmount } from "../domain/fruitAmount";
 import { FruitDescription } from "../domain/fruitDescription";
 import { FruitName } from "../domain/fruitName";
 
@@ -12,12 +13,13 @@ export class FruitMapper {
 				description: FruitDescription.create({
 					value: raw.description,
 				}).getValue(),
+				amount: FruitAmount.create({ value: raw.amount }).getValue(),
 			},
 			new UniqueEntityID(raw._id),
 		);
 
 		if (fruitOrError.isFailure) {
-			return fruitOrError.getErrorValue();
+			console.log(fruitOrError.getErrorValue());
 		}
 
 		return fruitOrError.getValue();
@@ -28,6 +30,7 @@ export class FruitMapper {
 			_id: fruit.id,
 			name: fruit.name.value,
 			description: fruit.description.value,
+			amount: fruit.amount.value,
 		};
 	}
 }

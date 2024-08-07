@@ -5,7 +5,6 @@ import type { DeleteStorageByFruitIdErrors } from "./deleteStorageByFruitIdError
 
 export type DeleteStorageByFruitIdResponse = Either<
 	| DeleteStorageByFruitIdErrors.StorageDoesNotExistError
-	| DeleteStorageByFruitIdErrors.StorageHasAmountError
 	| AppError.UnexpectedError
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	| Result<any>,

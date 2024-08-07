@@ -27,16 +27,10 @@ export class DeleteStorageByFruitIdController extends BaseController<
 
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	private _handleError(error: any) {
-		switch (error.constructor) {
-			case DeleteStorageByFruitIdErrors.StorageDoesNotExistError:
-				this.notFound(error.getErrorValue().message);
-				break;
-			case DeleteStorageByFruitIdErrors.StorageHasAmountError:
-				this.conflict(error.getErrorValue().message);
-				break;
-			default:
-				this.badRequest(error.getErrorValue());
-				break;
+		if (error.constructor === DeleteStorageByFruitIdErrors.StorageDoesNotExistError) {
+			return this.notFound(error.getErrorValue().message);
 		}
+
+		return this.badRequest(error.getErrorValue());
 	}
 }

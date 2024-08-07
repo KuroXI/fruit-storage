@@ -4,10 +4,6 @@ import type { IUnitOfWork } from "../IUnitOfWork";
 export class UnitOfWork implements IUnitOfWork {
 	private _session?: ClientSession;
 
-	get session(): ClientSession | undefined {
-		return this._session;
-	}
-
 	async startTransaction(): Promise<void> {
 		this._session = await startSession();
 		this._session?.startTransaction();

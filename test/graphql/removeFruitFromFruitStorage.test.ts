@@ -1,10 +1,12 @@
-import "jest";
-
 import { ApolloServer } from "@apollo/server";
 import schema from "../../src/shared/infrastructure/http/graphql/schema";
+import { unitOfWork } from "../../src/shared/infrastructure/unitOfWork";
+import type { UnitOfWork } from "../../src/shared/infrastructure/unitOfWork/implementations/UnitOfWork";
 import { removeFruitFromFruitStorageQuery } from "../query";
 import { seedFruitForFruitStorage } from "../seed/seedFruitForFruitStorage";
 import { closeConnection, connectToDatabase, dropAllCollection } from "../utils";
+
+jest.mock("../../src/shared/infrastructure/unitOfWork/implementations/UnitOfWork");
 
 const seed = {
 	name: "lemon",
@@ -14,13 +16,14 @@ const seed = {
 };
 
 describe("Fruit Remove Tests", () => {
-	beforeAll(async () => {
-		await connectToDatabase();
-		await dropAllCollection();
-		await seedFruitForFruitStorage(seed);
-	});
+	let mockUnitOfWork: UnitOfWork;
 
-	afterEach(async () => {
+	beforeAll(async () => await connectToDatabase());
+
+	beforeEach(async () => {
+		mockUnitOfWork = unitOfWork;
+		jest.resetAllMocks();
+
 		await dropAllCollection();
 		await seedFruitForFruitStorage(seed);
 	});
@@ -38,13 +41,18 @@ describe("Fruit Remove Tests", () => {
 			},
 		});
 
+		expect(mockUnitOfWork.abortTransaction).toHaveBeenCalledTimes(0);
+		expect(mockUnitOfWork.commitTransaction).toHaveBeenCalledTimes(1);
+		expect(mockUnitOfWork.endTransaction).toHaveBeenCalledTimes(1);
+		expect(mockUnitOfWork.startTransaction).toHaveBeenCalledTimes(1);
+
 		// @ts-ignore
 		const { data, errors } = result.body.singleResult;
 
 		expect(errors).toBeFalsy();
 		expect(data.removeFruitFromFruitStorage).toBeTruthy();
 		expect(data.removeFruitFromFruitStorage.fruit.name).toBe("lemon");
-		expect(data.removeFruitFromFruitStorage.amount).toBe(0);
+		expect(data.removeFruitFromFruitStorage.fruit.amount).toBe(0);
 	});
 
 	it("should fail to remove a fruit with an amount greater than stored", async () => {
@@ -55,6 +63,11 @@ describe("Fruit Remove Tests", () => {
 				amount: 6,
 			},
 		});
+
+		expect(mockUnitOfWork.abortTransaction).toHaveBeenCalledTimes(1);
+		expect(mockUnitOfWork.commitTransaction).toHaveBeenCalledTimes(0);
+		expect(mockUnitOfWork.endTransaction).toHaveBeenCalledTimes(1);
+		expect(mockUnitOfWork.startTransaction).toHaveBeenCalledTimes(1);
 
 		// @ts-ignore
 		const { data, errors } = result.body.singleResult;

@@ -1,5 +1,5 @@
 import { deleteFruitByNameController } from "../../../../../modules/fruit/useCases/deleteFruitByName";
-import { deleteStorageByFruitIdController } from "../../../../../modules/storage/useCases/deleteStorageByFruitId";
+import { getStorageByFruitIdController } from "../../../../../modules/storage/useCases/getStorageByFruitId";
 
 type DeleteFruitFromFruitStorageProps = {
 	name: string;
@@ -10,20 +10,19 @@ export const deleteFruitFromFruitStorageResolver = async (
 	props: DeleteFruitFromFruitStorageProps,
 ) => {
 	try {
-		const fruit = await deleteFruitByNameController.executeImpl({ name: props.name });
-		const storage = await deleteStorageByFruitIdController.executeImpl({
-			fruidId: fruit.fruitId.getStringValue(),
-			forceDelete: props.forceDelete,
+		const fruit = await deleteFruitByNameController.executeImpl(props);
+		const storage = await getStorageByFruitIdController.executeImpl({
+			fruitId: fruit.fruitId.getStringValue(),
 		});
 
 		return {
 			id: storage.storageId.getStringValue(),
 			limit: storage.limit.value,
-			amount: storage.amount.value,
 			fruit: {
 				id: fruit.fruitId.getStringValue(),
 				name: fruit.name.value,
 				description: fruit.description.value,
+				amount: fruit.amount.value,
 			},
 		};
 	} catch (error) {

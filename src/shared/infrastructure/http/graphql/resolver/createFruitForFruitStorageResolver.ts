@@ -13,9 +13,10 @@ export const createFruitForFruitStorageResolver = async (
 		const fruit = await createFruitController.executeImpl(props);
 
 		return {
-			id: fruit.id.toString(),
+			id: fruit.fruitId.getStringValue(),
 			name: fruit.name.value,
 			description: fruit.description.value,
+			amount: fruit.amount.value,
 		};
 	} catch (error) {
 		return error;

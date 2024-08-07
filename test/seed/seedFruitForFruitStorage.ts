@@ -14,6 +14,7 @@ export const seedFruitForFruitStorage = async (props: SeedFruitForFruitStoragePr
 		_id: new UniqueEntityID(),
 		name: props.name,
 		description: props.description,
+		amount: props.amount
 	});
 	await fruit.save();
 
@@ -21,7 +22,6 @@ export const seedFruitForFruitStorage = async (props: SeedFruitForFruitStoragePr
 		_id: new UniqueEntityID(),
 		fruitId: fruit._id,
 		limit: props.limit,
-		amount: props.amount,
 	});
 	await storage.save();
 };

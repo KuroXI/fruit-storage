@@ -20,11 +20,11 @@ export const updateFruitForFruitStorageResolver = async (
 		return {
 			id: storage.storageId.getStringValue(),
 			limit: storage.limit.value,
-			amount: storage.amount.value,
 			fruit: {
 				id: fruit.fruitId.getStringValue(),
 				name: fruit.name.value,
 				description: fruit.description.value,
+				amount: fruit.amount.value,
 			},
 		};
 	} catch (error) {

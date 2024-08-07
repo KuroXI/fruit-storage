@@ -15,14 +15,13 @@ const StorageSchema = new Schema({
 		},
 	},
 	fruitId: {
-		type: Schema.Types.ObjectId,
+		type: String,
 		index: {
 			required: true,
 			unique: true,
 		},
 	},
 	limit: { type: Number },
-	amount: { type: Number },
 });
 
 export const StorageModel = mongoose.model<IStorage>("Storage", StorageSchema);

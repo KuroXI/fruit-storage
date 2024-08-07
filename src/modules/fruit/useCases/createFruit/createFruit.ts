@@ -1,12 +1,11 @@
 import { AppError } from "../../../../shared/core/AppError";
 import { Result, left, right } from "../../../../shared/core/Result";
 import type { UseCase } from "../../../../shared/core/UseCase";
-import { UniqueEntityID } from "../../../../shared/domain/UniqueEntityID";
 import type { UnitOfWork } from "../../../../shared/infrastructure/unitOfWork/implementations/UnitOfWork";
-import { Fruit } from "../../domain/fruit";
+import type { Fruit } from "../../domain/fruit";
 import { FruitDescription } from "../../domain/fruitDescription";
-import { FruitId } from "../../domain/fruitId";
 import { FruitName } from "../../domain/fruitName";
+import { FruitFactory } from "../../factory/fruitFactory";
 import type { IFruitRepository } from "../../repositories/IFruitRepository";
 import type { ICreateFruitDTO } from "./createFruitDTO";
 import { CreateFruitErrors } from "./createFruitErrors";
@@ -28,17 +27,23 @@ export class CreateFruit implements UseCase<ICreateFruitDTO, CreateFruitResponse
 
 			const validateRequest = await this._validateRequest(request);
 			if (validateRequest.isFailure) {
+				await this._unitOfWork.abortTransaction();
 				return left(validateRequest);
 			}
 
-			const fruit = await this._createFruit(validateRequest.getValue());
-			await this._saveFruit(fruit.getValue());
+			const fruitOrError = this._createFruit(request.name, request.description);
+			if (fruitOrError.isFailure) {
+				await this._unitOfWork.abortTransaction();
+				return left(fruitOrError);
+			}
 
-			CreateFruitOutbox.emit(fruit.getValue(), request.limitOfFruitToBeStored);
+			await this._saveFruit(fruitOrError.getValue());
+
+			await this._emitOutboxEvent(fruitOrError.getValue(), request.limitOfFruitToBeStored);
 
 			await this._unitOfWork.commitTransaction();
 
-			return right(Result.ok<Fruit>(fruit.getValue()));
+			return right(Result.ok(fruitOrError.getValue()));
 		} catch (error) {
 			await this._unitOfWork.abortTransaction();
 			return left(new AppError.UnexpectedError(error));
@@ -47,28 +52,17 @@ export class CreateFruit implements UseCase<ICreateFruitDTO, CreateFruitResponse
 		}
 	}
 
-	private async _validateRequest(request: ICreateFruitDTO): Promise<
-		Result<{
-			fruitId: FruitId;
-			name: FruitName;
-			description: FruitDescription;
-		}>
-	> {
-		const fruitIdOrError = FruitId.create(new UniqueEntityID());
+	private async _validateRequest(request: ICreateFruitDTO): Promise<Result<void>> {
 		const fruitNameOrError = FruitName.create({ value: request.name });
 		const fruitDescriptionOrError = FruitDescription.create({ value: request.description });
 
-		const fruitCombineResult = Result.combine([
-			fruitIdOrError,
-			fruitNameOrError,
-			fruitDescriptionOrError,
-		]);
+		const fruitCombineResult = Result.combine([fruitNameOrError, fruitDescriptionOrError]);
 		if (fruitCombineResult.isFailure) {
-			return Result.fail(fruitCombineResult.getErrorValue());
+			return Result.fail(fruitCombineResult.getErrorValue().toString());
 		}
 
-		const fruitAlreadyExists = await this._isFruitExist(fruitNameOrError.getValue());
-		if (fruitAlreadyExists) {
+		const isFruitExist = await this._isFruitExist(fruitNameOrError.getValue());
+		if (isFruitExist) {
 			return Result.fail(
 				new CreateFruitErrors.FruitAlreadyExistError(
 					fruitNameOrError.getValue().props.value,
@@ -76,27 +70,11 @@ export class CreateFruit implements UseCase<ICreateFruitDTO, CreateFruitResponse
 			);
 		}
 
-		return Result.ok({
-			fruitId: fruitIdOrError.getValue(),
-			name: fruitNameOrError.getValue(),
-			description: fruitDescriptionOrError.getValue(),
-		});
+		return Result.ok();
 	}
 
-	private async _createFruit(props: {
-		fruitId: FruitId;
-		name: FruitName;
-		description: FruitDescription;
-	}): Promise<Result<Fruit>> {
-		const fruitOrError = Fruit.create(
-			{ name: props.name, description: props.description },
-			props.fruitId.getValue(),
-		);
-		if (fruitOrError.isFailure) {
-			return Result.fail(fruitOrError.getErrorValue().toString());
-		}
-
-		return Result.ok(fruitOrError.getValue());
+	private _createFruit(name: string, description: string): Result<Fruit> {
+		return FruitFactory.create({ name, description });
 	}
 
 	private async _isFruitExist(name: FruitName): Promise<boolean> {
@@ -105,5 +83,9 @@ export class CreateFruit implements UseCase<ICreateFruitDTO, CreateFruitResponse
 
 	private async _saveFruit(fruit: Fruit): Promise<void> {
 		await this._fruitRepository.saveFruit(fruit);
+	}
+
+	private async _emitOutboxEvent(fruit: Fruit, limit: number) {
+		await CreateFruitOutbox.emit(fruit, limit);
 	}
 }

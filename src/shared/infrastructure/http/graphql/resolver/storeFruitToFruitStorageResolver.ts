@@ -1,5 +1,6 @@
 import { getFruitByNameController } from "../../../../../modules/fruit/useCases/getFruitByName";
-import { storeAmountToStorageController } from "../../../../../modules/storage/useCases/storeAmountToStorage";
+import { storeAmountToFruitController } from "../../../../../modules/fruit/useCases/storeAmountToFruit";
+import { getStorageByFruitIdController } from "../../../../../modules/storage/useCases/getStorageByFruitId";
 
 type StoreFruitToFruitStorageProps = {
 	name: string;
@@ -8,20 +9,24 @@ type StoreFruitToFruitStorageProps = {
 
 export const storeFruitToFruitStorageResolver = async (props: StoreFruitToFruitStorageProps) => {
 	try {
-		const fruit = await getFruitByNameController.executeImpl(props);
-		const storage = await storeAmountToStorageController.executeImpl({
-			fruidId: fruit.fruitId.getStringValue(),
-			amount: props.amount,
+		const fruit = await getFruitByNameController.executeImpl({ name: props.name });
+		const storage = await getStorageByFruitIdController.executeImpl({
+			fruitId: fruit.fruitId.getStringValue(),
+		});
+
+		const updatedFruit = await storeAmountToFruitController.executeImpl({
+			...props,
+			limit: storage.limit.value,
 		});
 
 		return {
 			id: storage.storageId.getStringValue(),
 			limit: storage.limit.value,
-			amount: storage.amount.value,
 			fruit: {
-				id: fruit.fruitId.getStringValue(),
-				name: fruit.name.value,
-				description: fruit.description.value,
+				id: updatedFruit.fruitId.getStringValue(),
+				name: updatedFruit.name.value,
+				description: updatedFruit.description.value,
+				amount: updatedFruit.amount.value,
 			},
 		};
 	} catch (error) {

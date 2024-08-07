@@ -36,8 +36,8 @@ export class GetFruitByName implements UseCase<IGetFruitByNameDTO, GetFruitByNam
 			return Result.fail(fruitNameOrError.getErrorValue().toString());
 		}
 
-		const fruitAlreadyExists = await this._isFruitExist(fruitNameOrError.getValue());
-		if (!fruitAlreadyExists) {
+		const isFruitExit = await this._isFruitExist(fruitNameOrError.getValue());
+		if (!isFruitExit) {
 			return Result.fail(
 				new GetFruitByNameErrors.FruitDoesNotExistError(
 					fruitNameOrError.getValue().props.value,

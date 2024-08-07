@@ -46,9 +46,9 @@ export class OutboxPayload extends AggregateRoot<OutboxProps> {
 		const guardResult = Guard.againstNullOrUndefinedBulk(guardArgs);
 
 		if (guardResult.isFailure) {
-			return Result.fail<OutboxPayload>(guardResult.getErrorValue());
+			return Result.fail(guardResult.getErrorValue());
 		}
 
-		return Result.ok<OutboxPayload>(new OutboxPayload(props, id));
+		return Result.ok(new OutboxPayload(props, id));
 	}
 }

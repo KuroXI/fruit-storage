@@ -1,11 +1,11 @@
 import { Result } from "../../../../shared/core/Result";
 import type { UseCaseError } from "../../../../shared/core/UseCaseError";
 
-export namespace RemoveAmountFromStorageErrors {
-	export class StorageDoesNotExistError extends Result<UseCaseError> {
-		constructor(id: string) {
+export namespace RemoveAmountFromFruitErrors {
+	export class FruitDoesNotExistError extends Result<UseCaseError> {
+		constructor(name: string) {
 			super(false, {
-				message: `Storage ${id} doesn't exist!`,
+				message: `The fruit name '${name}' does not exist!`,
 			} as UseCaseError);
 		}
 	}
@@ -19,7 +19,7 @@ export namespace RemoveAmountFromStorageErrors {
 	export class FinalAmountHasToBePositiveNumber extends Result<UseCaseError> {
 		constructor() {
 			super(false, {
-				message: "The limit for fruit to be stored cannot be a negative number.",
+				message: "The amount of fruit to be stored cannot be a negative number.",
 			} as UseCaseError);
 		}
 	}

@@ -4,7 +4,10 @@ import type { Fruit } from "../../domain/fruit";
 import type { DeleteFruitByNameErrors } from "./deleteFruitByNameErrors";
 
 export type DeleteFruitByNameResponse = Either<
+	| DeleteFruitByNameErrors.FruitDoesNotExistError
+	| DeleteFruitByNameErrors.FruitHasAmountError
+	| AppError.UnexpectedError
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	DeleteFruitByNameErrors.FruitDoesNotExistError | AppError.UnexpectedError | Result<any>,
+	| Result<any>,
 	Result<Fruit>
 >;

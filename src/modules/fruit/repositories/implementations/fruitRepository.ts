@@ -1,5 +1,6 @@
 import type { FruitModel } from "../../../../shared/infrastructure/database/mongoose/models/Fruit";
 import type { Fruit } from "../../domain/fruit";
+import type { FruitAmount } from "../../domain/fruitAmount";
 import type { FruitDescription } from "../../domain/fruitDescription";
 import type { FruitName } from "../../domain/fruitName";
 import { FruitMapper } from "../../mappers/fruitMapper";
@@ -19,12 +20,6 @@ export class FruitRepository implements IFruitRepository {
 	}
 
 	async saveFruit(fruit: Fruit): Promise<void> {
-		const exists = await this.exists(fruit.name);
-
-		if (exists) {
-			throw new Error("Fruit already exist!");
-		}
-
 		const rawMongooseFruit = FruitMapper.toPersistence(fruit);
 		await this._models.create(rawMongooseFruit);
 	}
@@ -45,6 +40,38 @@ export class FruitRepository implements IFruitRepository {
 
 	async getFruitByName(name: FruitName): Promise<Fruit> {
 		const fruit = await this._models.findOne({ name: name.value }).lean();
+
+		return FruitMapper.toDomain(fruit);
+	}
+
+	async storeAmountByName(name: FruitName, amount: FruitAmount): Promise<Fruit> {
+		const fruit = await this._models
+			.findOneAndUpdate(
+				{ name: name.value },
+				{
+					$inc: {
+						amount: amount.value,
+					},
+				},
+				{ new: true },
+			)
+			.lean();
+
+		return FruitMapper.toDomain(fruit);
+	}
+
+	async removeAmountByName(name: FruitName, amount: FruitAmount): Promise<Fruit> {
+		const fruit = await this._models
+			.findOneAndUpdate(
+				{ name: name.value },
+				{
+					$inc: {
+						amount: -amount.value,
+					},
+				},
+				{ new: true },
+			)
+			.lean();
 
 		return FruitMapper.toDomain(fruit);
 	}

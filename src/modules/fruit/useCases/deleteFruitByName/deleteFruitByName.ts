@@ -7,6 +7,7 @@ import { FruitName } from "../../domain/fruitName";
 import type { IFruitRepository } from "../../repositories/IFruitRepository";
 import type { IDeleteFruitByNameDTO } from "./deleteFruitByNameDTO";
 import { DeleteFruitByNameErrors } from "./deleteFruitByNameErrors";
+import { DeleteFruitByNameOutbox } from "./deleteFruitByNameOutbox";
 import type { DeleteFruitByNameResponse } from "./deleteFruitByNameResponse";
 
 export class DeleteFruitByName
@@ -26,10 +27,13 @@ export class DeleteFruitByName
 
 			const validateRequest = await this._validateRequest(request);
 			if (validateRequest.isFailure) {
+				await this._unitOfWork.abortTransaction();
 				return left(validateRequest);
 			}
 
 			const deletedFruit = await this._deleteFruitByFruitName(validateRequest.getValue());
+
+			await this._emitOutboxEvent(deletedFruit);
 
 			await this._unitOfWork.commitTransaction();
 
@@ -48,13 +52,18 @@ export class DeleteFruitByName
 			return Result.fail(fruitNameOrError.getErrorValue().toString());
 		}
 
-		const fruitAlreadyExists = await this._isFruitExist(fruitNameOrError.getValue());
-		if (!fruitAlreadyExists) {
+		const isFruitExist = await this._isFruitExist(fruitNameOrError.getValue());
+		if (!isFruitExist) {
 			return Result.fail(
 				new DeleteFruitByNameErrors.FruitDoesNotExistError(
 					fruitNameOrError.getValue().props.value,
 				).getErrorValue().message,
 			);
+		}
+
+		const fruit = await this._getFruitByName(fruitNameOrError.getValue());
+		if (fruit.amount.value > 0 && !request.forceDelete) {
+			return Result.fail(new DeleteFruitByNameErrors.FruitHasAmountError().getErrorValue().message);
 		}
 
 		return Result.ok(fruitNameOrError.getValue());
@@ -64,7 +73,15 @@ export class DeleteFruitByName
 		return await this._fruitRepository.exists(name);
 	}
 
+	private async _getFruitByName(name: FruitName): Promise<Fruit> {
+		return await this._fruitRepository.getFruitByName(name);
+	}
+
 	private async _deleteFruitByFruitName(name: FruitName): Promise<Fruit> {
 		return await this._fruitRepository.deleteFruitByName(name);
+	}
+
+	private async _emitOutboxEvent(fruit: Fruit) {
+		await DeleteFruitByNameOutbox.emit(fruit);
 	}
 }

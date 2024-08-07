@@ -1,6 +1,5 @@
 import { UniqueEntityID } from "../../../shared/domain/UniqueEntityID";
 import { Storage } from "../domain/storage";
-import { StorageAmount } from "../domain/storageAmount";
 import { StorageFruitId } from "../domain/storageFruitId";
 import { StorageLimit } from "../domain/storageLimit";
 
@@ -11,13 +10,12 @@ export class StorageMapper {
 			{
 				fruitId: StorageFruitId.create({ value: raw.fruitId }).getValue(),
 				limit: StorageLimit.create({ value: raw.limit }).getValue(),
-				amount: StorageAmount.create({ value: raw.amount }).getValue(),
 			},
 			new UniqueEntityID(raw._id),
 		);
 
 		if (storageOrError.isFailure) {
-			return storageOrError.getErrorValue();
+			console.log(storageOrError.getErrorValue());
 		}
 
 		return storageOrError.getValue();
@@ -28,7 +26,6 @@ export class StorageMapper {
 			_id: storage.storageId.getValue(),
 			fruitId: storage.fruitId.value,
 			limit: storage.limit.value,
-			amount: storage.amount.value,
 		};
 	}
 }

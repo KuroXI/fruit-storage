@@ -2,11 +2,11 @@ import { Guard } from "../../../shared/core/Guard";
 import { Result } from "../../../shared/core/Result";
 import { ValueObject } from "../../../shared/domain/ValueObject";
 
-interface StorageAmountProps {
+interface FruitAmountProps {
 	value: number;
 }
 
-export class StorageAmount extends ValueObject<StorageAmountProps> {
+export class FruitAmount extends ValueObject<FruitAmountProps> {
 	getStringValue(): string {
 		return String(this.props.value);
 	}
@@ -15,17 +15,17 @@ export class StorageAmount extends ValueObject<StorageAmountProps> {
 		return this.props.value;
 	}
 
-	private constructor(props: StorageAmountProps) {
+	private constructor(props: FruitAmountProps) {
 		super(props);
 	}
 
-	public static create(props: StorageAmountProps): Result<StorageAmount> {
+	public static create(props: FruitAmountProps): Result<FruitAmount> {
 		const guardResult = Guard.againstNullOrUndefined(props.value, "amount");
 
 		if (guardResult.isFailure) {
-			return Result.fail<StorageAmount>(guardResult.getErrorValue());
+			return Result.fail<FruitAmount>(guardResult.getErrorValue());
 		}
 
-		return Result.ok<StorageAmount>(new StorageAmount(props));
+		return Result.ok<FruitAmount>(new FruitAmount(props));
 	}
 }
