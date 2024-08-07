@@ -3,6 +3,7 @@
 
 
 type Fruit {
+  amount: Int
   description: String
   id: ID
   name: String
@@ -21,7 +22,6 @@ type Query {
 }
 
 type ReturnQuery {
-  amount: Int
   fruit: Fruit
   id: ID
   limit: Int

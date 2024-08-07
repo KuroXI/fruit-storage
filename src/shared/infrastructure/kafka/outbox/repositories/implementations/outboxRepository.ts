@@ -17,6 +17,9 @@ export class OutboxRepository implements IOutboxRepository {
 
 	async getPendings(): Promise<OutboxPayload[]> {
 		const pendings = await this._model.find({ processed: false }).lean();
+
+		console.log(pendings, "repository");
+
 		return pendings.map((pending) => OutboxMapper.toDomain(pending));
 	}
 

@@ -9,4 +9,11 @@ export namespace DeleteFruitByNameErrors {
 			} as UseCaseError);
 		}
 	}
+	export class FruitHasAmountError extends Result<UseCaseError> {
+		constructor() {
+			super(false, {
+				message: "Fruit cannot be deleted because it still has an amount stored.",
+			} as UseCaseError);
+		}
+	}
 }

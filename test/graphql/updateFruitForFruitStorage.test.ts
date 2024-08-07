@@ -1,10 +1,12 @@
-import "jest";
-
 import { ApolloServer } from "@apollo/server";
 import schema from "../../src/shared/infrastructure/http/graphql/schema";
+import { unitOfWork } from "../../src/shared/infrastructure/unitOfWork";
+import type { UnitOfWork } from "../../src/shared/infrastructure/unitOfWork/implementations/UnitOfWork";
 import { updateFruitForFruitStorageQuery } from "../query";
 import { seedFruitForFruitStorage } from "../seed/seedFruitForFruitStorage";
 import { closeConnection, connectToDatabase, dropAllCollection } from "../utils";
+
+jest.mock("../../src/shared/infrastructure/unitOfWork/implementations/UnitOfWork");
 
 const seed = {
 	name: "lemon",
@@ -14,13 +16,14 @@ const seed = {
 };
 
 describe("Fruit Update Tests", () => {
-	beforeAll(async () => {
-		await connectToDatabase();
-		await dropAllCollection();
-		await seedFruitForFruitStorage(seed);
-	});
+	let mockUnitOfWork: UnitOfWork;
 
-	afterEach(async () => {
+	beforeAll(async () => await connectToDatabase());
+
+	beforeEach(async () => {
+		mockUnitOfWork = unitOfWork;
+		jest.resetAllMocks();
+		
 		await dropAllCollection();
 		await seedFruitForFruitStorage(seed);
 	});
@@ -38,6 +41,11 @@ describe("Fruit Update Tests", () => {
 				limitOfFruitToBeStored: 10,
 			},
 		});
+
+		expect(mockUnitOfWork.abortTransaction).toHaveBeenCalledTimes(0);
+		expect(mockUnitOfWork.commitTransaction).toHaveBeenCalledTimes(2);
+		expect(mockUnitOfWork.endTransaction).toHaveBeenCalledTimes(2);
+		expect(mockUnitOfWork.startTransaction).toHaveBeenCalledTimes(2);
 
 		// @ts-ignore
 		const { data, errors } = result.body.singleResult;
@@ -58,6 +66,11 @@ describe("Fruit Update Tests", () => {
 				limitOfFruitToBeStored: 10,
 			},
 		});
+
+		expect(mockUnitOfWork.abortTransaction).toHaveBeenCalledTimes(1);
+		expect(mockUnitOfWork.commitTransaction).toHaveBeenCalledTimes(0);
+		expect(mockUnitOfWork.endTransaction).toHaveBeenCalledTimes(1);
+		expect(mockUnitOfWork.startTransaction).toHaveBeenCalledTimes(1);
 
 		// @ts-ignore
 		const { data, errors } = result.body.singleResult;

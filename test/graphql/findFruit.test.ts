@@ -1,5 +1,3 @@
-import "jest";
-
 import { ApolloServer } from "@apollo/server";
 import schema from "../../src/shared/infrastructure/http/graphql/schema";
 import { findFruitQuery } from "../query";
@@ -14,13 +12,9 @@ const seed = {
 };
 
 describe("Find Fruit Tests", () => {
-	beforeAll(async () => {
-		await connectToDatabase();
-		await dropAllCollection();
-		await seedFruitForFruitStorage(seed);
-	});
+	beforeAll(async () => await connectToDatabase());
 
-	afterEach(async () => {
+	beforeEach(async () => {
 		await dropAllCollection();
 		await seedFruitForFruitStorage(seed);
 	});

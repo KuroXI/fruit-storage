@@ -26,6 +26,11 @@ export class StorageLimit extends ValueObject<StorageLimitProps> {
 			return Result.fail<StorageLimit>(guardResult.getErrorValue());
 		}
 
+		const minimumLimitGuardResult = Guard.greaterThan(0, props.value);
+		if (minimumLimitGuardResult.isFailure) {
+			return Result.fail<StorageLimit>(minimumLimitGuardResult.getErrorValue());
+		}
+
 		return Result.ok<StorageLimit>(new StorageLimit(props));
 	}
 }

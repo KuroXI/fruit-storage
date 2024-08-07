@@ -1,8 +1,7 @@
-import { type IGuardArgument, Guard } from "../../../shared/core/Guard";
+import { Guard, type IGuardArgument } from "../../../shared/core/Guard";
 import { Result } from "../../../shared/core/Result";
 import { AggregateRoot } from "../../../shared/domain/AggregateRoot";
 import type { UniqueEntityID } from "../../../shared/domain/UniqueEntityID";
-import type { StorageAmount } from "./storageAmount";
 import type { StorageFruitId } from "./storageFruitId";
 import { StorageId } from "./storageId";
 import type { StorageLimit } from "./storageLimit";
@@ -10,7 +9,6 @@ import type { StorageLimit } from "./storageLimit";
 interface StorageProps {
 	fruitId: StorageFruitId;
 	limit: StorageLimit;
-	amount: StorageAmount;
 }
 
 export class Storage extends AggregateRoot<StorageProps> {
@@ -26,10 +24,6 @@ export class Storage extends AggregateRoot<StorageProps> {
 		return this.props.limit;
 	}
 
-	get amount(): StorageAmount {
-		return this.props.amount;
-	}
-
 	private constructor(props: StorageProps, id?: UniqueEntityID) {
 		super(props, id);
 	}
@@ -38,17 +32,11 @@ export class Storage extends AggregateRoot<StorageProps> {
 		const guardArgs: IGuardArgument[] = [
 			{ argument: props.fruitId, argumentName: "fruitId" },
 			{ argument: props.limit, argumentName: "limit" },
-			{ argument: props.amount, argumentName: "amount" },
 		];
 
 		const guardResult = Guard.againstNullOrUndefinedBulk(guardArgs);
 		if (guardResult.isFailure) {
 			return Result.fail<Storage>(guardResult.getErrorValue());
-		}
-
-		const amountLimitGuardResult = Guard.greaterThan(props.amount.value, props.limit.value);
-		if (amountLimitGuardResult.isFailure) {
-			return Result.fail<Storage>(amountLimitGuardResult.getErrorValue());
 		}
 
 		return Result.ok<Storage>(new Storage(props, id));

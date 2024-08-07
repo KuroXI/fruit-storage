@@ -1,3 +1,4 @@
+import { AppError } from "../../../../shared/core/AppError";
 import { BaseController } from "../../../../shared/infrastructure/http/models/BaseController";
 import type { Fruit } from "../../domain/fruit";
 import type { DeleteFruitByName } from "./deleteFruitByName";
@@ -24,10 +25,19 @@ export class DeleteFruitByNameController extends BaseController<IDeleteFruitByNa
 
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 	private _handleError(error: any) {
-		if (error.constructor === DeleteFruitByNameErrors.FruitDoesNotExistError) {
-			return this.notFound(error.getErrorValue().message);
+		switch (error.constructor) {
+			case DeleteFruitByNameErrors.FruitDoesNotExistError:
+				this.notFound(error.getErrorValue().message);
+				break;
+			case DeleteFruitByNameErrors.FruitHasAmountError:
+				this.conflict(error.getErrorValue().message);
+				break;
+			case AppError.UnexpectedError:
+				this.badRequest(error.getErrorValue().message);
+				break;
+			default:
+				this.badRequest(error.getErrorValue());
+				break;
 		}
-
-		return this.badRequest(error.getErrorValue());
 	}
 }

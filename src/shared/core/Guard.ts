@@ -18,11 +18,19 @@ export class Guard {
 		return Result.ok<GuardResponse>();
 	}
 
+	public static lessThanOrEqual(minValue: number, actualValue: number): Result<GuardResponse> {
+		return actualValue <= minValue
+			? Result.ok<GuardResponse>()
+			: Result.fail<GuardResponse>(
+					`Number given {${actualValue}} is greater than {${minValue}}`,
+				);
+	}
+
 	public static greaterThan(minValue: number, actualValue: number): Result<GuardResponse> {
 		return actualValue > minValue
 			? Result.ok<GuardResponse>()
 			: Result.fail<GuardResponse>(
-					`Number given {${actualValue}} is not greater than {${minValue}}`,
+					`Number given {${actualValue}} is less than {${minValue}}`,
 				);
 	}
 

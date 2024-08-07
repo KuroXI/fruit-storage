@@ -1,5 +1,5 @@
-import { getFruitByNameController } from "../../../../../modules/fruit/useCases/getFruitByName";
-import { removeAmountFromStorageController } from "../../../../../modules/storage/useCases/removeAmountFromStorage";
+import { removeAmountFromFruitController } from "../../../../../modules/fruit/useCases/removeAmountFromFruit";
+import { getStorageByFruitIdController } from "../../../../../modules/storage/useCases/getStorageByFruitId";
 
 type RemoveFruitFromFruitStorageProps = {
 	name: string;
@@ -10,20 +10,19 @@ export const removeFruitFromFruitStorageResolver = async (
 	props: RemoveFruitFromFruitStorageProps,
 ) => {
 	try {
-		const fruit = await getFruitByNameController.executeImpl(props);
-		const storage = await removeAmountFromStorageController.executeImpl({
-			fruidId: fruit.fruitId.getStringValue(),
-			amount: props.amount,
+		const fruit = await removeAmountFromFruitController.executeImpl(props);
+		const storage = await getStorageByFruitIdController.executeImpl({
+			fruitId: fruit.fruitId.getStringValue(),
 		});
 
 		return {
 			id: storage.storageId.getStringValue(),
 			limit: storage.limit.value,
-			amount: storage.amount.value,
 			fruit: {
 				id: fruit.fruitId.getStringValue(),
 				name: fruit.name.value,
 				description: fruit.description.value,
+				amount: fruit.amount.value,
 			},
 		};
 	} catch (error) {

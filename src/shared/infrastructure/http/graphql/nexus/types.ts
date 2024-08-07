@@ -29,6 +29,7 @@ export interface NexusGenScalars {
 
 export interface NexusGenObjects {
   Fruit: { // root type
+    amount?: number | null; // Int
     description?: string | null; // String
     id?: string | null; // ID
     name?: string | null; // String
@@ -36,7 +37,6 @@ export interface NexusGenObjects {
   Mutation: {};
   Query: {};
   ReturnQuery: { // root type
-    amount?: number | null; // Int
     fruit?: NexusGenRootTypes['Fruit'] | null; // Fruit
     id?: string | null; // ID
     limit?: number | null; // Int
@@ -55,6 +55,7 @@ export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
 export interface NexusGenFieldTypes {
   Fruit: { // field return type
+    amount: number | null; // Int
     description: string | null; // String
     id: string | null; // ID
     name: string | null; // String
@@ -70,7 +71,6 @@ export interface NexusGenFieldTypes {
     findFruit: NexusGenRootTypes['ReturnQuery'] | null; // ReturnQuery
   }
   ReturnQuery: { // field return type
-    amount: number | null; // Int
     fruit: NexusGenRootTypes['Fruit'] | null; // Fruit
     id: string | null; // ID
     limit: number | null; // Int
@@ -79,6 +79,7 @@ export interface NexusGenFieldTypes {
 
 export interface NexusGenFieldTypeNames {
   Fruit: { // field return type name
+    amount: 'Int'
     description: 'String'
     id: 'ID'
     name: 'String'
@@ -94,7 +95,6 @@ export interface NexusGenFieldTypeNames {
     findFruit: 'ReturnQuery'
   }
   ReturnQuery: { // field return type name
-    amount: 'Int'
     fruit: 'Fruit'
     id: 'ID'
     limit: 'Int'

@@ -26,6 +26,7 @@ const FruitSchema = new Schema({
 			required: true,
 		},
 	},
+	amount: { type: Number },
 });
 
 export const FruitModel = mongoose.model<IFruit>("Fruit", FruitSchema);

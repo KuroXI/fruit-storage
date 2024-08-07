@@ -2,6 +2,7 @@ import { Guard, type IGuardArgument } from "../../../shared/core/Guard";
 import { Result } from "../../../shared/core/Result";
 import { AggregateRoot } from "../../../shared/domain/AggregateRoot";
 import type { UniqueEntityID } from "../../../shared/domain/UniqueEntityID";
+import type { FruitAmount } from "./fruitAmount";
 import type { FruitDescription } from "./fruitDescription";
 import { FruitId } from "./fruitId";
 import type { FruitName } from "./fruitName";
@@ -9,6 +10,7 @@ import type { FruitName } from "./fruitName";
 export interface FruitProps {
 	name: FruitName;
 	description: FruitDescription;
+	amount: FruitAmount;
 }
 
 export class Fruit extends AggregateRoot<FruitProps> {
@@ -24,6 +26,10 @@ export class Fruit extends AggregateRoot<FruitProps> {
 		return this.props.description;
 	}
 
+	get amount(): FruitAmount {
+		return this.props.amount;
+	}
+
 	private constructor(props: FruitProps, id?: UniqueEntityID) {
 		super(props, id);
 	}
@@ -32,6 +38,7 @@ export class Fruit extends AggregateRoot<FruitProps> {
 		const guardArgs: IGuardArgument[] = [
 			{ argument: props.name, argumentName: "name" },
 			{ argument: props.description, argumentName: "description" },
+			{ argument: props.amount, argumentName: "amount" },
 		];
 
 		const guardResult = Guard.againstNullOrUndefinedBulk(guardArgs);
