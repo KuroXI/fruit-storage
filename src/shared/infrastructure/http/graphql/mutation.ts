@@ -33,8 +33,7 @@ export const mutation = mutationType({
 				description: nonNull(stringArg()),
 				limitOfFruitToBeStored: nonNull(intArg()),
 			},
-			resolve: (_, args) =>
-				createFruitForFruitStorageResolver(args) as NexusGenRootTypes["Fruit"],
+			resolve: (_, args) => createFruitForFruitStorageResolver(args) as NexusGenRootTypes["Fruit"],
 		});
 		type.nonNull.field("updateFruitForFruitStorage", {
 			type: "ReturnQuery",

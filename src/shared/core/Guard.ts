@@ -21,17 +21,13 @@ export class Guard {
 	public static lessThanOrEqual(minValue: number, actualValue: number): Result<GuardResponse> {
 		return actualValue <= minValue
 			? Result.ok<GuardResponse>()
-			: Result.fail<GuardResponse>(
-					`Number given {${actualValue}} is greater than {${minValue}}`,
-				);
+			: Result.fail<GuardResponse>(`Number given {${actualValue}} is greater than {${minValue}}`);
 	}
 
 	public static greaterThan(minValue: number, actualValue: number): Result<GuardResponse> {
 		return actualValue > minValue
 			? Result.ok<GuardResponse>()
-			: Result.fail<GuardResponse>(
-					`Number given {${actualValue}} is less than {${minValue}}`,
-				);
+			: Result.fail<GuardResponse>(`Number given {${actualValue}} is less than {${minValue}}`);
 	}
 
 	public static againstAtLeast(numChars: number, text: string): Result<GuardResponse> {
