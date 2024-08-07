@@ -2,8 +2,6 @@ import type { Consumer, KafkaMessage } from "kafkajs";
 import { kafkaConfig } from "../../../config";
 import type { OutboxRepository } from "../../../shared/infrastructure/kafka/outbox/repositories/implementations/outboxRepository";
 import type { UnitOfWork } from "../../../shared/infrastructure/unitOfWork/implementations/UnitOfWork";
-import { FRUIT_CREATE_EVENT_NAME } from "../../fruit/domain/events/fruitCreated";
-import { FRUIT_DELETE_EVENT_NAME } from "../../fruit/domain/events/fruitDeleted";
 import { createStorageUseCase } from "../useCases/createStorage";
 import { deleteStorageByFruitIdUseCase } from "../useCases/deleteStorageByFruitId";
 import type { IOutboxConsumer } from "./IOutboxConsumer";
@@ -52,12 +50,12 @@ export class OutboxConsumer implements IOutboxConsumer {
 		console.log(`[CONSUMER] Consuming ${eventPayload._id.value}`);
 
 		switch (eventPayload.eventName) {
-			case FRUIT_CREATE_EVENT_NAME: {
+			case "FRUIT_CREATE": {
 				await this._handleFruitCreateEvent(eventPayload);
 				await this._markPayloadAsProcessed(eventPayload._id.value);
 				break;
 			}
-			case FRUIT_DELETE_EVENT_NAME: {
+			case "FRUIT_DELETE": {
 				await this._handleFruitStorageEvent(eventPayload);
 				await this._markPayloadAsProcessed(eventPayload._id.value);
 				break;
@@ -67,11 +65,6 @@ export class OutboxConsumer implements IOutboxConsumer {
 					`[CONSUMER] (${eventPayload._id.value}) - Invalid Event: ${eventPayload.eventName}`,
 				);
 				break;
-		}
-
-		if (eventPayload.eventName === FRUIT_CREATE_EVENT_NAME) {
-			await this._handleFruitCreateEvent(eventPayload);
-			await this._markPayloadAsProcessed(eventPayload._id.value);
 		}
 	}
 

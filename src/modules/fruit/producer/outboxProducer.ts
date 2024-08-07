@@ -3,7 +3,6 @@ import { kafkaConfig } from "../../../config";
 import { OutboxMapper } from "../../../shared/infrastructure/kafka/outbox/mappers/outboxMapper";
 import type { OutboxPayload } from "../../../shared/infrastructure/kafka/outbox/outboxPayload";
 import type { OutboxRepository } from "../../../shared/infrastructure/kafka/outbox/repositories/implementations/outboxRepository";
-import { FRUIT_CREATE_EVENT_NAME } from "../domain/events/fruitCreated";
 import type { IOutboxProcuder } from "./IOutboxProducer";
 
 export class OutboxProducer implements IOutboxProcuder {
@@ -18,7 +17,7 @@ export class OutboxProducer implements IOutboxProcuder {
 	async execute(): Promise<void> {
 		const transaction = await this._producer.transaction();
 		try {
-			const pendings = await this._filterPayloadPendings();
+			const pendings = await this._getPayloadPendings();
 			if (!pendings.length) return await transaction.abort();
 
 			await this._handleTransaction(transaction, pendings);
@@ -49,13 +48,5 @@ export class OutboxProducer implements IOutboxProcuder {
 
 	private async _getPayloadPendings(): Promise<OutboxPayload[]> {
 		return await this._outboxRepository.getPendings();
-	}
-
-	private async _filterPayloadPendings(): Promise<OutboxPayload[]> {
-		const validEventNames = [FRUIT_CREATE_EVENT_NAME];
-
-		const pendings = await this._getPayloadPendings();
-
-		return pendings.filter((pending) => validEventNames.includes(pending.eventName));
 	}
 }

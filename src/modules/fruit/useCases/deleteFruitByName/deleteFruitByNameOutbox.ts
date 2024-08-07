@@ -1,17 +1,17 @@
 import { OutboxPayload } from "../../../../shared/infrastructure/kafka/outbox/outboxPayload";
 import { outboxRepository } from "../../../../shared/infrastructure/kafka/outbox/repositories";
-import { FruitCreated } from "../../domain/events/fruitCreated";
+import { FruitDomainEvent } from "../../domain/events/fruitDomainEvent";
 import type { Fruit } from "../../domain/fruit";
 
 export class DeleteFruitByNameOutbox {
 	public static async emit(fruit: Fruit) {
-		const event = new FruitCreated(fruit);
+		const event = new FruitDomainEvent("FRUIT_DELETE", fruit);
 
 		const outboxPayloadOrError = OutboxPayload.create({
-			eventName: event.getEventName(),
+			eventName: event.eventName,
 			payload: JSON.stringify(event.getPayloadToJSON()),
 			processed: false,
-			createdAt: event.getDateTimeOccurred(),
+			createdAt: event.dateTimeOccurred,
 		});
 		if (outboxPayloadOrError.isFailure) throw new Error();
 
